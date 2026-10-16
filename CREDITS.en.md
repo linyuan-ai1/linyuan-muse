@@ -24,7 +24,7 @@ Source projects:
 - [jnMetaCode/agency-orchestrator](https://github.com/jnMetaCode/agency-orchestrator) (Apache-2.0, Chinese-language prompts)
 - Upstream: [msitarzewski/agency-agents](https://github.com/msitarzewski/agency-agents) (MIT, Copyright © 2025 AgentLand Contributors)
 
-Roles involved: product manager, trend researcher, software architect, backend architect, frontend developer, UI designer, UX architect, UX researcher, code reviewer, security engineer, SRE, technical writer, WeChat Mini Program developer, mobile app developer, API tester, reality checker, performance benchmarker, accessibility auditor, compliance auditor, legal compliance, government digitalization pre-sales, China market localization, agent orchestration.
+Roles involved: product manager, trend researcher, software architect, backend architect, frontend developer, UI designer, UX architect, UX researcher, code reviewer, security engineer, SRE, technical writer, WX Mini Program developer, mobile app developer, API tester, reality checker, performance benchmarker, accessibility auditor, compliance auditor, legal compliance, government digitalization pre-sales, China market localization, agent orchestration.
 
 Licence text: [`app/src/main/assets/licenses/devroles-Apache2.txt`](app/src/main/assets/licenses/devroles-Apache2.txt)
 

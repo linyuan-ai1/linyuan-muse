@@ -24,7 +24,7 @@ App 里用于群聊讨论的**专家 / 开发角色 / 名人思维 / 工程师�
 - [jnMetaCode/agency-orchestrator](https://github.com/jnMetaCode/agency-orchestrator)（Apache-2.0，中文版提示词）
 - 上游：[msitarzewski/agency-agents](https://github.com/msitarzewski/agency-agents)（MIT，Copyright © 2025 AgentLand Contributors）
 
-涉及角色：产品经理、趋势研究员、软件架构师、后端架构师、前端开发、UI 设计师、UX 架构师、UX 研究员、代码审查员、安全工程师、SRE、技术文档工程师、微信小程序开发、移动应用开发、API 测试、现实校验、性能基准测试、可访问性审计、合规审计、法务合规、政务数字化售前、中国市场本地化、智能体编排。
+涉及角色：产品经理、趋势研究员、软件架构师、后端架构师、前端开发、UI 设计师、UX 架构师、UX 研究员、代码审查员、安全工程师、SRE、技术文档工程师、WX 小程序开发、移动应用开发、API 测试、现实校验、性能基准测试、可访问性审计、合规审计、法务合规、政务数字化售前、中国市场本地化、智能体编排。
 
 许可全文：[`app/src/main/assets/licenses/devroles-Apache2.txt`](app/src/main/assets/licenses/devroles-Apache2.txt)
 
