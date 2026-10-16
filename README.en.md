@@ -203,7 +203,7 @@ Two hard UI conventions (read before touching buttons or dialogs):
 
 ## Credits
 
-Most of the built-in group-chat role prompts (engineering roles, famous-minds, engineer personas) were **collected from open-source prompt projects on GitHub, or distilled/adapted from them with AI assistance — they are not original work of this project**. Known sources and their licences, plus an honest note about the parts whose origin could not be traced, are in **[CREDITS.md](CREDITS.md)**. If you are an original author and want attribution added or content removed, please open an issue.
+Most of the built-in group-chat role prompts (engineering roles, famous-minds, engineer personas) were **collected from open-source prompt projects on GitHub, or distilled/adapted from them with AI assistance — they are not original work of this project**. Known sources and their licences, plus an honest note about the parts whose origin could not be traced, are in **[CREDITS.en.md](CREDITS.en.md)** (Chinese original: [CREDITS.md](CREDITS.md)). If you are an original author and want attribution added or content removed, please open an issue.
 
 ## License
 
