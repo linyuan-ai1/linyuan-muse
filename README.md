@@ -228,5 +228,5 @@ App 内置的群聊角色提示词库（开发角色 / 名人思维 / 工程师�
 - 与 GPL 的关键区别（第 13 条）：**就算你只把它部署成网络服务给别人用、一个字节都不分发，也必须向使用者提供完整源码**；
 - 商用并没有被禁止，但商用方同样受"必须开源"的约束。
 
-> 随仓库分发的第三方组件许可证：sherpa-onnx（Apache-2.0）、commonmark（BSD-2-Clause）、kotlin-stdlib（Apache-2.0）。
+> 随仓库分发的第三方组件许可证：sherpa-onnx（Apache-2.0）、commonmark（BSD-2-Clause）、kotlin-stdlib（Apache-2.0）、端侧声纹模型 voiceprint.onnx（3D-Speaker CAM++，经 sherpa-onnx 分发，Apache-2.0；详见 [CREDITS.md](CREDITS.md)）。
 > 高德地图 SDK 为专有软件，不随仓库分发（需自行下载，另受高德开放平台协议约束）。

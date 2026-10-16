@@ -37,6 +37,13 @@ App 里用于群聊讨论的**专家 / 开发角色 / 名人思维 / 工程师�
 
 许可全文：[`app/src/main/assets/licenses/personas-MIT.txt`](app/src/main/assets/licenses/personas-MIT.txt)
 
+### 3. 端侧声纹模型（voiceprint.onnx）
+
+- 文件：`app/src/main/assets/voiceprint.onnx`（约 28MB，随仓库分发以便开箱可用）
+- 模型：`3dspeaker_speech_campplus_sv_zh-cn_16k-common`（3D-Speaker CAM++ 中文声纹模型，192 维嵌入，本地离线推理）
+- 分发来源：[k2-fsa/sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)（Apache-2.0）；上游 [3D-Speaker](https://github.com/modelscope/3D-Speaker) 项目同为 Apache-2.0
+- 用途：端侧声纹验证（判断"是不是机主的声音"），不联网、不上传音频
+
 ## 无法追溯来源的部分（诚实说明）
 
 以下内容**未能确认原始出处**（多为补齐角色班底时收集或蒸馏生成，散落自多方）：
