@@ -72,7 +72,7 @@ public class AiClient {
         return "";
     }
 
-    public static final String MARK_TOKENIQ = "[TQ] ";
+    public static final String MARK_WEBSEARCH = "[WS] ";
     public static final String MARK_FALLBACK = "[FB] ";
 
     private static String appendToolLog(String existing, String name, String argSummary, String resultSummary) {
@@ -86,8 +86,8 @@ public class AiClient {
     private static String appendToolLog(String existing, String name, String argSummary,
                                         String resultSummary, String source, String resultDetail) {
         String prefix = "";
-        if ("tokeniq".equals(source)) {
-            prefix = MARK_TOKENIQ;
+        if ("websearch".equals(source)) {
+            prefix = MARK_WEBSEARCH;
         } else if ("custom".equals(source)) {
 
             prefix = "[API] ";
@@ -1848,7 +1848,7 @@ public class AiClient {
                     + AppSettings.BUILTIN_SEARCH_KEY_POOL.length + " 个密钥");
         }
         if (raw.trim().isEmpty()) return;
-        String defBase = isBlank(settings.tokeniqBaseUrl) ? "" : settings.tokeniqBaseUrl.trim();
+        String defBase = isBlank(settings.searchBaseUrl) ? "" : settings.searchBaseUrl.trim();
         while (defBase.endsWith("/")) defBase = defBase.substring(0, defBase.length() - 1);
         for (String line : raw.split("\n")) {
             String s = line.trim();
@@ -1961,13 +1961,13 @@ public class AiClient {
         }
 
         // 只有配了用户 key 或密钥池非空才走搜索 API，否则直接降级 Bing RSS。
-        if (!isBlank(settings.tokeniqApiKey) || searchPoolSize() > 0) {
+        if (!isBlank(settings.searchApiKey) || searchPoolSize() > 0) {
             try {
                 JSONArray r = searchViaTokentiq(settings, query, freshness);
-                LAST_SEARCH_SOURCE = "tokeniq";
+                LAST_SEARCH_SOURCE = "websearch";
                 return r;
             } catch (Exception e) {
-                android.util.Log.w("VC_SEARCH", "tokeniq 搜索失败，降级 Bing RSS: " + e.getMessage());
+                android.util.Log.w("VC_SEARCH", "websearch 搜索失败，降级 Bing RSS: " + e.getMessage());
                 LAST_SEARCH_SOURCE = "bing(fallback): " + e.getMessage();
             }
         } else {
@@ -1988,17 +1988,17 @@ public class AiClient {
             key = picked.apiKey;
             LAST_SEARCH_SOURCE = "pool(" + poolReadyCount() + "/" + searchPool.size() + " 可用)";
         } else {
-            base = isBlank(settings.tokeniqBaseUrl) ? "" : settings.tokeniqBaseUrl.trim();
+            base = isBlank(settings.searchBaseUrl) ? "" : settings.searchBaseUrl.trim();
             while (base.endsWith("/")) base = base.substring(0, base.length() - 1);
-            key = settings.tokeniqApiKey;
+            key = settings.searchApiKey;
         }
         String endpoint = base + "/v1/search";
         JSONObject body = new JSONObject();
         body.put("query", query);
-        body.put("count", settings.tokeniqSearchCount > 0 ? settings.tokeniqSearchCount : 8);
+        body.put("count", settings.searchCount > 0 ? settings.searchCount : 8);
 
         String fresh = normalizeFreshness(
-                !isBlank(freshness) ? freshness.trim() : (isBlank(settings.tokeniqFreshness) ? "" : settings.tokeniqFreshness.trim()));
+                !isBlank(freshness) ? freshness.trim() : (isBlank(settings.searchFreshness) ? "" : settings.searchFreshness.trim()));
         if (!fresh.isEmpty()) {
             body.put("freshness", fresh);
         }
@@ -2222,13 +2222,13 @@ public class AiClient {
     }
 
     private static String fetchUrlRaw(AppSettings settings, String url) throws Exception {
-        if (settings != null && !isBlank(settings.tokeniqApiKey)) {
+        if (settings != null && !isBlank(settings.searchApiKey)) {
             try {
                 String t = fetchViaTokentiq(settings, url);
-                LAST_FETCH_SOURCE = "tokeniq";
+                LAST_FETCH_SOURCE = "websearch";
                 return t;
             } catch (Exception e) {
-                android.util.Log.w("VC_SEARCH", "tokeniq 抓网页失败，降级自解析: " + e.getMessage());
+                android.util.Log.w("VC_SEARCH", "websearch 抓网页失败，降级自解析: " + e.getMessage());
                 LAST_FETCH_SOURCE = "self(fallback): " + e.getMessage();
             }
         } else {
@@ -2263,7 +2263,7 @@ public class AiClient {
 
     private static String fetchViaTokentiq(AppSettings settings, String url) throws Exception {
         if (isBlank(url)) throw new RuntimeException("url 不能为空");
-        String base = isBlank(settings.tokeniqBaseUrl) ? "" : settings.tokeniqBaseUrl.trim();
+        String base = isBlank(settings.searchBaseUrl) ? "" : settings.searchBaseUrl.trim();
         while (base.endsWith("/")) base = base.substring(0, base.length() - 1);
         JSONObject body = new JSONObject();
         body.put("url", url.trim());
@@ -2274,7 +2274,7 @@ public class AiClient {
             connection.setReadTimeout(settings.readTimeout > 0 ? settings.readTimeout : 90000);
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Authorization", "Bearer " + settings.tokeniqApiKey.trim());
+            connection.setRequestProperty("Authorization", "Bearer " + settings.searchApiKey.trim());
             OutputStream output = connection.getOutputStream();
             output.write(body.toString().getBytes(StandardCharsets.UTF_8));
             output.flush();
@@ -3868,7 +3868,7 @@ public class AiClient {
         }
 
         String body = t;
-        if (body.startsWith("[TQ] ")) body = body.substring(5).trim();
+        if (body.startsWith("[WS] ")) body = body.substring(5).trim();
         else if (body.startsWith("[FB] ")) body = body.substring(5).trim();
         else if (body.startsWith("🔧")) body = body.substring(1).trim();
         for (String n : KNOWN_TOOLS) {
@@ -5501,7 +5501,7 @@ public class AiClient {
                                     + "这**不会暂停讨论**，请继续按格式输出正式发言。\"}";
                         }
                     } else {
-                        if ("tokeniq".equals(toolSource(name))) viaNewSearch = true;
+                        if ("websearch".equals(toolSource(name))) viaNewSearch = true;
                         try {
                             final AiClient.ToolHandler h = searchToolHandler;
                             String rr = h == null ? toolErrorJson("该角色没有配置联网工具")

@@ -343,10 +343,10 @@ public class TaskRunner {
     private static AppSettings buildSearchSettings(android.content.SharedPreferences sp) {
         AppSettings s = new AppSettings();
         s.webSearchApiUrl = sp.getString("webSearchApiUrl", s.webSearchApiUrl);
-        s.tokeniqBaseUrl = sp.getString("tokeniqBaseUrl", s.tokeniqBaseUrl);
-        s.tokeniqApiKey = sp.getString("tokeniqApiKey", s.tokeniqApiKey);
-        s.tokeniqFreshness = sp.getString("tokeniqFreshness", s.tokeniqFreshness);
-        try { s.tokeniqSearchCount = sp.getInt("tokeniqSearchCount", s.tokeniqSearchCount); } catch (Exception ignored) {}
+        s.searchBaseUrl = sp.getString("searchBaseUrl", s.searchBaseUrl);
+        s.searchApiKey = sp.getString("searchApiKey", s.searchApiKey);
+        s.searchFreshness = sp.getString("searchFreshness", s.searchFreshness);
+        try { s.searchCount = sp.getInt("searchCount", s.searchCount); } catch (Exception ignored) {}
         try { s.connectTimeout = sp.getInt("connectTimeout", s.connectTimeout); } catch (Exception ignored) {}
         try { s.readTimeout = sp.getInt("readTimeout", s.readTimeout); } catch (Exception ignored) {}
 

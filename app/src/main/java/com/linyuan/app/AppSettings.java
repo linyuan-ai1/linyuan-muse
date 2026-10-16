@@ -26,10 +26,10 @@ public class AppSettings {
     public boolean webSearchEnabled = false;
     public String webSearchApiUrl = "";
 
-    public String tokeniqBaseUrl = "";  // 搜索服务地址（OpenAI 兼容格式），公开版不内置，请在设置页填写
-    public String tokeniqApiKey = "";
-    public int tokeniqSearchCount = 20;
-    public String tokeniqFreshness = "";
+    public String searchBaseUrl = "";  // 搜索服务地址（OpenAI 兼容格式），公开版不内置，请在设置页填写
+    public String searchApiKey = "";
+    public int searchCount = 20;
+    public String searchFreshness = "";
     public int searchMinGapSec = 8;
 
     public int searchPerMinute = 30;

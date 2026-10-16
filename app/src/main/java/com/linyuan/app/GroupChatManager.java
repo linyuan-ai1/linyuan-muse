@@ -11799,7 +11799,7 @@ public class GroupChatManager {
       LinearLayout form = new LinearLayout(this.activity);
       form.setOrientation(1);
       sv.addView(form);
-      EditText nameEt = this.field(form, "服务商名称", isNew ? "" : existing.name, "如：tokeniq 中转 / 阿里百炼");
+      EditText nameEt = this.field(form, "服务商名称", isNew ? "" : existing.name, "如：阿里百炼 / 硅基流动");
       EditText baseEt = this.field(form, "请求地址", isNew ? "" : existing.baseUrl, "OpenAI 兼容地址，如 https://xxx/v1");
       EditText keyEt = this.field(form, "API Key", isNew ? "" : existing.apiKey, "该服务商的密钥");
       this.attachPasswordToggleGM(keyEt);

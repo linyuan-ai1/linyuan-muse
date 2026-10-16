@@ -1165,7 +1165,7 @@
                                                     android:textColor="@color/muted"
                                                     android:textSize="11sp" />
                                                 <EditText
-                                                    android:id="@+id/settingsTokeniqBaseUrl"
+                                                    android:id="@+id/settingsSearchBaseUrl"
                                                     android:layout_width="match_parent"
                                                     android:layout_height="48dp"
                                                     android:layout_marginTop="4dp"
@@ -1186,12 +1186,12 @@
                                                     android:textColor="@color/muted"
                                                     android:textSize="11sp" />
                                                 <EditText
-                                                    android:id="@+id/settingsTokeniqApiKey"
+                                                    android:id="@+id/settingsSearchApiKey"
                                                     android:layout_width="match_parent"
                                                     android:layout_height="48dp"
                                                     android:layout_marginTop="4dp"
                     android:background="@drawable/bg_edit"
-                                                    android:hint="例如 sk-wb-xxxxx"
+                                                    android:hint="例如 sk-xxxxx"
                                                     android:inputType="text"
                                                     android:paddingStart="12dp"
                                                     android:paddingEnd="12dp"
@@ -1266,7 +1266,7 @@
                                                     android:textColor="@color/muted"
                                                     android:textSize="11sp" />
                                                 <EditText
-                                                    android:id="@+id/settingsTokeniqSearchCount"
+                                                    android:id="@+id/settingsSearchCount"
                                                     android:layout_width="match_parent"
                                                     android:layout_height="48dp"
                                                     android:layout_marginTop="4dp"
@@ -1287,7 +1287,7 @@
                                                     android:textColor="@color/muted"
                                                     android:textSize="11sp" />
                                                 <EditText
-                                                    android:id="@+id/settingsTokeniqFreshness"
+                                                    android:id="@+id/settingsSearchFreshness"
                                                     android:layout_width="match_parent"
                                                     android:layout_height="48dp"
                                                     android:layout_marginTop="4dp"

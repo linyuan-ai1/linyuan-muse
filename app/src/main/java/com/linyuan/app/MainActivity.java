@@ -362,10 +362,10 @@ public class MainActivity extends Activity {
     private TextView settingsPoolStatus;
     private EditText settingsWebSearchApiUrl;
 
-    private EditText settingsTokeniqBaseUrl;
-    private EditText settingsTokeniqApiKey;
-    private EditText settingsTokeniqSearchCount;
-    private EditText settingsTokeniqFreshness;
+    private EditText settingsSearchBaseUrl;
+    private EditText settingsSearchApiKey;
+    private EditText settingsSearchCount;
+    private EditText settingsSearchFreshness;
     private EditText settingsSearchMinGap;
     private EditText settingsSearchPerMinute;
     private String lastToolLog = "";
@@ -1170,10 +1170,10 @@ public class MainActivity extends Activity {
         settingsPoolCooldown = findViewById(R.id.settingsPoolCooldown);
         settingsPoolStatus = findViewById(R.id.settingsPoolStatus);
         settingsWebSearchApiUrl = findViewById(R.id.settingsWebSearchApiUrl);
-        settingsTokeniqBaseUrl = findViewById(R.id.settingsTokeniqBaseUrl);
-        settingsTokeniqApiKey = findViewById(R.id.settingsTokeniqApiKey);
-        settingsTokeniqSearchCount = findViewById(R.id.settingsTokeniqSearchCount);
-        settingsTokeniqFreshness = findViewById(R.id.settingsTokeniqFreshness);
+        settingsSearchBaseUrl = findViewById(R.id.settingsSearchBaseUrl);
+        settingsSearchApiKey = findViewById(R.id.settingsSearchApiKey);
+        settingsSearchCount = findViewById(R.id.settingsSearchCount);
+        settingsSearchFreshness = findViewById(R.id.settingsSearchFreshness);
         settingsSearchMinGap = findViewById(R.id.settingsSearchMinGap);
         settingsSearchPerMinute = findViewById(R.id.settingsSearchPerMinute);
         Button testSearchBtn = findViewById(R.id.testSearchServiceButton);
@@ -1274,7 +1274,7 @@ public class MainActivity extends Activity {
         try {
             EditText[] keyFields = new EditText[]{
                     settingsApiKey,
-                    settingsTokeniqApiKey,
+                    settingsSearchApiKey,
                     settingsSearchKeyPool,
                     settingsTencentSecretId,
                     settingsTencentSecretKey,
@@ -5257,7 +5257,7 @@ public class MainActivity extends Activity {
         String[] lines = toolLog.split("\n");
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            boolean isNew = line.startsWith("[TQ] ");
+            boolean isNew = line.startsWith("[WS] ");
             if (isNew) line = line.substring(5);
             int start = sb.length();
             sb.append(line);
@@ -5315,7 +5315,7 @@ public class MainActivity extends Activity {
         if ("web_search".equals(toolName)) src = AiClient.LAST_SEARCH_SOURCE;
         else if ("fetch_url".equals(toolName)) src = AiClient.LAST_FETCH_SOURCE;
         else return false;
-        return src != null && src.startsWith("tokeniq");
+        return src != null && src.startsWith("websearch");
     }
 
     void appendLiveTool(String name, String argSummary, boolean start) {
@@ -8178,10 +8178,10 @@ public class MainActivity extends Activity {
                 emb.put("enabled", settings.memoryUseVector);
                 basic.put("embedding", emb);
                 JSONObject search = new JSONObject();
-                search.put("base_url", settings.tokeniqBaseUrl);
-                search.put("api_key", maskKey(settings.tokeniqApiKey));
+                search.put("base_url", settings.searchBaseUrl);
+                search.put("api_key", maskKey(settings.searchApiKey));
                 search.put("pool_size", AiClient.searchPoolSize());
-                search.put("count", settings.tokeniqSearchCount);
+                search.put("count", settings.searchCount);
                 basic.put("search", search);
                 JSONObject img = new JSONObject();
                 img.put("base_url", settings.imageGenBaseUrl);
@@ -8284,19 +8284,19 @@ public class MainActivity extends Activity {
                     break;
 
                 case "search_base_url":
-                    settings.tokeniqBaseUrl = v; ed.putString("tokeniqBaseUrl", v);
+                    settings.searchBaseUrl = v; ed.putString("searchBaseUrl", v);
                     try { AiClient.refreshSearchPool(settings); } catch (Throwable ignored) { }
                     break;
                 case "search_api_key":
                     if (v.contains("****")) return false;
-                    settings.tokeniqApiKey = v; ed.putString("tokeniqApiKey", v); break;
+                    settings.searchApiKey = v; ed.putString("searchApiKey", v); break;
                 case "search_key_pool":
 
                     settings.searchKeyPool = v; ed.putString("searchKeyPool", v);
                     try { AiClient.refreshSearchPool(settings); } catch (Throwable ignored) { }
                     break;
-                case "search_count": settings.tokeniqSearchCount = (int) parseNum(v, settings.tokeniqSearchCount);
-                    ed.putInt("tokeniqSearchCount", settings.tokeniqSearchCount); break;
+                case "search_count": settings.searchCount = (int) parseNum(v, settings.searchCount);
+                    ed.putInt("searchCount", settings.searchCount); break;
 
                 case "image_base_url":
                     settings.imageGenBaseUrl = v; ed.putString("imageGenBaseUrl", v);
@@ -15711,10 +15711,10 @@ public class MainActivity extends Activity {
             }
         }
         settingsWebSearchApiUrl.setText(settings.webSearchApiUrl);
-        if (settingsTokeniqBaseUrl != null) settingsTokeniqBaseUrl.setText(settings.tokeniqBaseUrl);
-        if (settingsTokeniqApiKey != null) settingsTokeniqApiKey.setText(settings.tokeniqApiKey);
-        if (settingsTokeniqSearchCount != null) settingsTokeniqSearchCount.setText(String.valueOf(settings.tokeniqSearchCount));
-        if (settingsTokeniqFreshness != null) settingsTokeniqFreshness.setText(settings.tokeniqFreshness);
+        if (settingsSearchBaseUrl != null) settingsSearchBaseUrl.setText(settings.searchBaseUrl);
+        if (settingsSearchApiKey != null) settingsSearchApiKey.setText(settings.searchApiKey);
+        if (settingsSearchCount != null) settingsSearchCount.setText(String.valueOf(settings.searchCount));
+        if (settingsSearchFreshness != null) settingsSearchFreshness.setText(settings.searchFreshness);
         if (settingsSearchMinGap != null) settingsSearchMinGap.setText(String.valueOf(settings.searchMinGapSec));
         if (settingsSearchPerMinute != null) settingsSearchPerMinute.setText(String.valueOf(settings.searchPerMinute));
 
@@ -15837,10 +15837,10 @@ public class MainActivity extends Activity {
         }
         next.webSearchApiUrl = settingsWebSearchApiUrl.getText().toString().trim();
 
-        next.tokeniqBaseUrl = settingsTokeniqBaseUrl == null ? settings.tokeniqBaseUrl
-                : settingsTokeniqBaseUrl.getText().toString().trim();
-        next.tokeniqApiKey = settingsTokeniqApiKey == null ? settings.tokeniqApiKey
-                : settingsTokeniqApiKey.getText().toString().trim();
+        next.searchBaseUrl = settingsSearchBaseUrl == null ? settings.searchBaseUrl
+                : settingsSearchBaseUrl.getText().toString().trim();
+        next.searchApiKey = settingsSearchApiKey == null ? settings.searchApiKey
+                : settingsSearchApiKey.getText().toString().trim();
 
         if (settingsTencentTtsSwitch != null) next.useTencentTts = settingsTencentTtsSwitch.isChecked();
         if (settingsTencentSecretId != null) next.tencentSecretId = settingsTencentSecretId.getText().toString().trim();
@@ -15868,13 +15868,13 @@ public class MainActivity extends Activity {
         }
         AiClient.refreshSearchPool(next);
         try { ImageGen.refreshPool(next); } catch (Throwable ignored) { }
-        if (settingsTokeniqSearchCount != null) {
-            try { next.tokeniqSearchCount = Integer.parseInt(settingsTokeniqSearchCount.getText().toString().trim()); }
-            catch (Exception e) { next.tokeniqSearchCount = 20; }
-            if (next.tokeniqSearchCount <= 0) next.tokeniqSearchCount = 20;
+        if (settingsSearchCount != null) {
+            try { next.searchCount = Integer.parseInt(settingsSearchCount.getText().toString().trim()); }
+            catch (Exception e) { next.searchCount = 20; }
+            if (next.searchCount <= 0) next.searchCount = 20;
         }
-        next.tokeniqFreshness = settingsTokeniqFreshness == null ? settings.tokeniqFreshness
-                : settingsTokeniqFreshness.getText().toString().trim();
+        next.searchFreshness = settingsSearchFreshness == null ? settings.searchFreshness
+                : settingsSearchFreshness.getText().toString().trim();
         if (settingsSearchMinGap != null) {
             try {
                 int v = Integer.parseInt(settingsSearchMinGap.getText().toString().trim());
@@ -16023,10 +16023,10 @@ public class MainActivity extends Activity {
         editor.putBoolean("useMemoryTools", next.useMemoryTools);
         editor.putBoolean("webSearchEnabled", next.webSearchEnabled);
         editor.putString("webSearchApiUrl", next.webSearchApiUrl);
-        editor.putString("tokeniqBaseUrl", next.tokeniqBaseUrl);
-        editor.putString("tokeniqApiKey", next.tokeniqApiKey);
-        editor.putInt("tokeniqSearchCount", next.tokeniqSearchCount);
-        editor.putString("tokeniqFreshness", next.tokeniqFreshness);
+        editor.putString("searchBaseUrl", next.searchBaseUrl);
+        editor.putString("searchApiKey", next.searchApiKey);
+        editor.putInt("searchCount", next.searchCount);
+        editor.putString("searchFreshness", next.searchFreshness);
         editor.putInt("searchMinGapSec", next.searchMinGapSec);
         editor.putInt("searchPerMinute", next.searchPerMinute);
         editor.putString("searchKeyPool", next.searchKeyPool);
@@ -16181,8 +16181,8 @@ public class MainActivity extends Activity {
     }
 
     private void testSearchService() {
-        final String base = settingsTokeniqBaseUrl == null ? "" : settingsTokeniqBaseUrl.getText().toString().trim();
-        final String key = settingsTokeniqApiKey == null ? "" : settingsTokeniqApiKey.getText().toString().trim();
+        final String base = settingsSearchBaseUrl == null ? "" : settingsSearchBaseUrl.getText().toString().trim();
+        final String key = settingsSearchApiKey == null ? "" : settingsSearchApiKey.getText().toString().trim();
         if (key.isEmpty()) {
             toast("请先填写搜索服务密钥");
             return;
@@ -16190,9 +16190,9 @@ public class MainActivity extends Activity {
         toast("正在测试搜索服务…");
         bgExecute(() -> {
             AppSettings probe = new AppSettings();
-            probe.tokeniqBaseUrl = base;
-            probe.tokeniqApiKey = key;
-            probe.tokeniqSearchCount = 3;
+            probe.searchBaseUrl = base;
+            probe.searchApiKey = key;
+            probe.searchCount = 3;
             probe.connectTimeout = settings.connectTimeout;
             probe.readTimeout = settings.readTimeout;
             String msg;
@@ -16482,7 +16482,7 @@ public class MainActivity extends Activity {
                         + "，它必须是多模态模型；不接受图片时会自动改用下面的辅助视觉模型并告知）。\n"
                 : "图片识别：上传图片时先用独立视觉模型（默认 ").append(settings.visionModel)
                         .append("）识别成文字，再让主模型基于文字回答；地址/模型/Key 可在上面修改。\n");
-        sb.append("联网搜索：优先用「搜索服务地址+密钥」（默认 tokeniq，结构化结果更稳）；额度用完或换服务时，在上方改地址/密钥并保存即可，改完可点「🧪 测试搜索服务」验证。留空密钥或调用失败会自动回退内置 Bing 搜索。");
+        sb.append("联网搜索：优先用「搜索服务地址+密钥」（默认 websearch，结构化结果更稳）；额度用完或换服务时，在上方改地址/密钥并保存即可，改完可点「🧪 测试搜索服务」验证。留空密钥或调用失败会自动回退内置 Bing 搜索。");
         settingsHint.setText(sb.toString());
     }
 
@@ -17161,10 +17161,10 @@ public class MainActivity extends Activity {
         result.useMemoryTools = sp.getBoolean("useMemoryTools", d.useMemoryTools);
         result.webSearchEnabled = sp.getBoolean("webSearchEnabled", d.webSearchEnabled);
         result.webSearchApiUrl = pref(sp, "webSearchApiUrl", d.webSearchApiUrl);
-        result.tokeniqBaseUrl = pref(sp, "tokeniqBaseUrl", d.tokeniqBaseUrl);
-        result.tokeniqApiKey = pref(sp, "tokeniqApiKey", d.tokeniqApiKey);
-        result.tokeniqSearchCount = sp.getInt("tokeniqSearchCount", d.tokeniqSearchCount);
-        result.tokeniqFreshness = pref(sp, "tokeniqFreshness", d.tokeniqFreshness);
+        result.searchBaseUrl = pref(sp, "searchBaseUrl", d.searchBaseUrl);
+        result.searchApiKey = pref(sp, "searchApiKey", d.searchApiKey);
+        result.searchCount = sp.getInt("searchCount", d.searchCount);
+        result.searchFreshness = pref(sp, "searchFreshness", d.searchFreshness);
         result.searchMinGapSec = sp.getInt("searchMinGapSec", d.searchMinGapSec);
         result.searchKeyPool = pref(sp, "searchKeyPool", d.searchKeyPool);
         result.useTencentTts = sp.getBoolean("useTencentTts", d.useTencentTts);
