@@ -8,6 +8,43 @@
 > 工程文件夹、工程名、代码包名（`com.linyuan.app`）、应用显示名已全部同步；
 > 仅 `applicationId` 与数据库/偏好文件名因**数据兼容**保留旧值，见下方「关于内部标识」。
 
+## 界面预览 · Screenshots
+
+<table>
+<tr>
+<td><img src="screenshots/01-main-chat.jpg" width="240"></td>
+<td><img src="screenshots/02-group-templates.jpg" width="240"></td>
+<td><img src="screenshots/03-group-members.jpg" width="240"></td>
+</tr>
+<tr>
+<td><img src="screenshots/04-group-discussion.jpg" width="240"></td>
+<td><img src="screenshots/05-group-list.jpg" width="240"></td>
+<td><img src="screenshots/06-group-plans.jpg" width="240"></td>
+</tr>
+<tr>
+<td><img src="screenshots/07-docs.jpg" width="240"></td>
+<td><img src="screenshots/08-settings.jpg" width="240"></td>
+<td><img src="screenshots/09-image-gen.jpg" width="240"></td>
+</tr>
+<tr>
+<td><img src="screenshots/10-image-generating.jpg" width="240"></td>
+<td><img src="screenshots/11-web-search.jpg" width="240"></td>
+<td><img src="screenshots/12-history.jpg" width="240"></td>
+</tr>
+<tr>
+<td><img src="screenshots/13-input-panel.jpg" width="240"></td>
+<td><img src="screenshots/14-context-usage.jpg" width="240"></td>
+<td><img src="screenshots/15-thinking-level.jpg" width="240"></td>
+</tr>
+<tr>
+<td><img src="screenshots/16-image-gen-dark.jpg" width="240"></td>
+<td><img src="screenshots/17-group-usage.jpg" width="240"></td>
+<td></td>
+</tr>
+</table>
+
+> 真机截图（OPPO 手机，含深/浅两套主题）。全部截图文件见 [`screenshots/`](screenshots/) 目录。
+
 ## 能力概览
 
 **对话**
