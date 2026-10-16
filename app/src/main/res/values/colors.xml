@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#F4F1EC</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surfaceInput">#FBF9F5</color>
+    <color name="surfaceElevated">#FFFFFF</color>
+    <color name="border">#E7E1D6</color>
+    <color name="borderStrong">#D6CFC1</color>
+    <color name="divider">#ECE7DE</color>
+    <color name="text">#202632</color>
+    <color name="text2">#3A4152</color>
+    <color name="muted">#6B7280</color>
+    <color name="faint">#98A0AE</color>
+    <color name="fainter">#B4BAC6</color>
+    <color name="accent">#2F6BE6</color>
+    <color name="accentBright">#4C8DFF</color>
+    <color name="accentSoft">#E6EEFF</color>
+    <!-- 卡片描边：#2F6BE6 的 25% 透明度（气泡里模型卡片的边框同款） -->
+    <color name="accentLine">#402F6BE6</color>
+    <color name="onAccent">#FFFFFF</color>
+    <color name="userBubble">#2F6BE6</color>
+    <color name="userBubbleText">#FFFFFF</color>
+    <color name="aiBubble">#FFFFFF</color>
+    <color name="aiBubbleText">#202632</color>
+    <color name="danger">#DC2626</color>
+    <color name="dangerSoft">#FCE8E8</color>
+    <color name="navBar">#FFFFFF</color>
+    <color name="navActive">#2F6BE6</color>
+    <color name="navInactive">#9AA0AE</color>
+    <color name="panel">#FFFFFF</color>
+    <color name="panel2">#FFFFFF</color>
+    <color name="glow">#2F6BE6</color>
+
+    <color name="searchAccent">#E8791A</color>
+
+
+    <color name="btnSecondaryDepth">#C7D8F5</color>
+
+    <color name="btnPrimaryDepth">#1E52BE</color>
+
+    <color name="btnGhostDepth">#DAD3C7</color>
+
+    <color name="inputBarDepth">#D5CDBE</color>
+
+    <color name="btnDangerDepth">#B31C1C</color>
+
+    <color name="cardDepth">#DCD5C9</color>
+
+    <color name="ic_launcher_background">#090909</color>
+</resources>

@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'com.linyuan.app'
+    compileSdk 35
+
+    defaultConfig {
+        // 历史 applicationId，**故意不改**：改掉等于换成另一个 App —— 老用户的记忆/对话/设置（含 API Key）、
+        // 已授予的运行时权限与无障碍/通知使用权开关全部要重新来一遍。对外显示名走 @string/app_name（lin渊）。
+        applicationId 'com.voicecompanion.app'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.0'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    // 端上声纹识别：sherpa-onnx（自带与 CAM++ 模型匹配的 fbank 前端 + ONNX 推理），仅保留 arm64/armv7 两个手机 ABI
+    implementation files('libs/sherpa-onnx-1.13.6-slim.aar')
+    // sherpa-onnx 的 Java/Kotlin 包装类引用了 kotlin-stdlib 运行时
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.24'
+    // 高德地图/导航/定位/搜索 四合一内置 SDK（本地 jar，非 Maven 坐标）
+    implementation files('libs/amap-navi-map-loc-search-11.3.100.jar')
+    // Markdown 渲染（纯框架工程接不进 androidx 库，用 commonmark 解析后自己 span 化）
+    implementation 'org.commonmark:commonmark:0.24.0'
+}

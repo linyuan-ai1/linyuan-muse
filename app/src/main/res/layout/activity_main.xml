@@ -1,0 +1,3062 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+                    android:background="@color/bg"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:fitsSystemWindows="true">
+
+
+
+    <LinearLayout
+        android:id="@+id/rootColumn"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical">
+
+
+            <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+                    android:background="@color/divider" />
+
+
+
+<FrameLayout
+            android:id="@+id/settingsBackBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-10dp"
+                    android:background="@color/bg"
+        android:paddingStart="8dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:visibility="gone">
+
+
+        <Button
+            android:id="@+id/settingsBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_gravity="start|center_vertical"
+                    android:background="@drawable/btn_ghost_square"
+                    android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:includeFontPadding="false"
+            android:gravity="center"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:text="‹ 返回"
+            android:textColor="@color/accent"
+            android:textSize="12sp" />
+
+
+        <TextView
+            android:id="@+id/settingsBackTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:includeFontPadding="false"
+            android:gravity="center"
+            android:text="设置"
+            android:textColor="@color/text"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+        </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/callPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="vertical">
+
+            <ScrollView
+                android:id="@+id/callScroll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:fillViewport="true"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp">
+
+                <LinearLayout
+                    android:id="@+id/callMessagesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:orientation="vertical"
+                    android:paddingBottom="8dp" />
+            </ScrollView>
+
+            <LinearLayout
+                android:id="@+id/thinkLevelBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/thinkLevelButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:background="@drawable/model_btn_card"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:text="🧠 思考：标准"
+                    android:textColor="@color/accent"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/thinkLevelHint"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textColor="@color/muted"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/expandEditorButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/icon_btn"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:padding="0dp"
+                    android:text="⤢"
+                    android:textColor="@color/text"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/callModeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:background="@drawable/model_btn_card"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="📞通话"
+                    android:textColor="@color/accent"
+                    android:textSize="12sp" />
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/attachSlotsRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:orientation="horizontal"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/inputBarRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:elevation="3dp"
+                android:outlineProvider="background"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="8dp"
+                    android:background="@drawable/input_bar_soft"
+                android:clipChildren="true"
+                android:clipToOutline="true"
+                android:clipToPadding="true"
+                android:gravity="center_vertical"
+                    android:minHeight="46dp"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <EditText
+                    android:id="@+id/textInput"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:gravity="center_vertical"
+                    android:hint="输入消息"
+                    android:imeOptions="actionSend"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:maxLines="6"
+                    android:minLines="1"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:scrollbars="vertical"
+                    android:scrollbarStyle="insideOverlay"
+                    android:overScrollMode="ifContentScrolls"
+                    android:textColor="@color/text"
+                    android:textColorHint="@color/muted"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/pauseCallButton"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/icon_btn"
+                    android:minWidth="0dp"
+                    android:padding="0dp"
+                    android:text="⏸"
+                    android:textColor="@color/text"
+                    android:textSize="18sp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/sendButton"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/ic_plus_ring"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:padding="0dp"
+                    android:text=""
+                    android:textColor="@color/onAccent"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/messagePanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="14dp"
+            android:visibility="gone">
+
+            <ScrollView
+                android:id="@+id/messageScroll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:id="@+id/messagesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="8dp" />
+            </ScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/gmPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+                    android:background="@color/bg"
+            android:orientation="vertical"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="1dp"
+            android:visibility="gone">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/gmBackButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:background="@drawable/btn_ghost"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="‹ 返回"
+                    android:textColor="@color/accent"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/gmTitleText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="8dp"
+                    android:text="群聊"
+                    android:textColor="@color/text"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+
+
+                <Button
+                    android:id="@+id/gmMembersButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:background="@drawable/btn_ghost"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="👥 成员"
+                    android:textColor="@color/accent"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+
+                <Button
+                    android:id="@+id/gmConfirmButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:singleLine="true"
+                    android:text="定稿"
+                    android:textColor="@color/accent"
+                    android:textSize="11sp"
+                    android:visibility="gone" />
+
+
+                <Button
+                    android:id="@+id/gmAdminButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:background="@drawable/btn_ghost"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="🧑‍✈️ 管理员"
+                    android:textColor="@color/accent"
+                    android:textSize="11sp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/gmSettingsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:background="@drawable/btn_ghost"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="⚙"
+                    android:textColor="@color/accent"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+
+            <FrameLayout
+                android:id="@+id/gmContent"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/memoryPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="14dp"
+            android:visibility="gone">
+
+
+            <EditText
+                android:id="@+id/memorySearchInput"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_edit"
+                android:hint="搜索记忆"
+                android:inputType="text"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/text"
+                android:textColorHint="@color/muted"
+                android:textSize="13sp" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/allMemoryButton"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:background="@drawable/btn_secondary"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:text="用户"
+                    android:textColor="@color/text"
+                    android:textSize="11sp" />
+
+
+                <Button
+                    android:id="@+id/memoryFilterDropdownButton"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:background="@drawable/btn_secondary"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:text="助手记忆"
+                    android:textColor="@color/text"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/pinnedMemoryButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:text="只看置顶" />
+
+                <Button
+                    android:id="@+id/storeUserButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:text="👤 用户画像" />
+
+                <Button
+                    android:id="@+id/storeMemoryButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:text="📒 长期记忆" />
+
+                <Button
+                    android:id="@+id/storeSelfButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:text="🪞 它的记忆" />
+
+                <Button
+                    android:id="@+id/archivedMemoryButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:text="📦 已归档" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="end|center_vertical"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/exportMemoryBackupButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="8dp"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:background="@drawable/btn_secondary"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="⬇️ 备份"
+                    android:textColor="@color/text"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/importMemoryBackupButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="8dp"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:background="@drawable/btn_ghost"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="⬆️ 恢复"
+                    android:textColor="@color/muted"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/shareMemoryBackupButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="8dp"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:background="@drawable/btn_secondary"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="📤 发微信"
+                    android:textColor="@color/text"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/clearAllButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="8dp"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:background="@drawable/btn_ghost"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="清空"
+                    android:textColor="#FCA5A5"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/importDocButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:background="@drawable/btn_secondary"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="📄 导入文档"
+                    android:textColor="@color/text"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/knowledgeScroll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/knowledgeListContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+            <ScrollView
+                android:id="@+id/memoryScroll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:id="@+id/memoryListContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="8dp" />
+            </ScrollView>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/docsPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="14dp"
+            android:visibility="gone">
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/docsTabMain"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_primary"
+                    android:text="📝 主对话"
+                    android:textColor="@color/onAccent"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/docsTabGroup"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_secondary"
+                    android:text="👥 群聊"
+                    android:textColor="@color/text"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/docsTabKnowledge"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_secondary"
+                    android:text="📚 知识库文档"
+                    android:textColor="@color/text"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <ScrollView
+                android:id="@+id/docsScroll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:id="@+id/docsListContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="8dp" />
+            </ScrollView>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/galleryPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="14dp"
+            android:visibility="gone">
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/galleryCount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/text2"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/galleryRefreshButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:background="@drawable/btn_secondary"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="刷新"
+                    android:textColor="@color/text"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+
+            <ScrollView
+                android:id="@+id/galleryScroll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:id="@+id/galleryGridContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="8dp" />
+            </ScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/settingsPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:id="@+id/settingsContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="14dp">
+
+                    <TextView
+                        android:id="@+id/assistantEntryButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:text="主动式助手 ›"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/memoryEntryButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
+                    android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:text="🧠 记忆库 ›"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/perceptionEntryButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:text="🗺 感知树 ›"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/docsEntryButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
+                    android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:text="📚 文档库 ›"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/gmEntryButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
+                    android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:text="👥 群聊 ›"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+
+                    <TextView
+                        android:id="@+id/providerEntryButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:text="🏢 服务商 ›"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    
+                    <LinearLayout
+                        android:id="@+id/collapseHeader_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                    android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="13dp"
+                        android:paddingBottom="13dp">
+                        <TextView
+                            android:id="@+id/collapseArrow_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:text="▾"
+                            android:textColor="@color/accent"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="① 基础开关"
+                            android:textColor="@color/text"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/collapseContent_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                    android:background="@drawable/card"
+                        android:orientation="vertical"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:visibility="visible">
+                                                <Switch
+                                                    android:id="@+id/settingsDarkThemeSwitch"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="深色主题"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+                                            <Switch
+                                                android:id="@+id/settingsThinkingSwitch"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="10dp"
+                                                android:text="启用思考"
+                                                android:textColor="@color/text"
+                                                android:textSize="13sp" />
+                                            <Switch
+                                                android:id="@+id/settingsMemoryEnabledSwitch"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="10dp"
+                                                android:text="启用记忆"
+                                                android:textColor="@color/text"
+                                                android:textSize="13sp" />
+                                            <Switch
+                                                android:id="@+id/settingsMemoryUseVectorSwitch"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="10dp"
+                                                android:text="向量检索"
+                                                android:textColor="@color/text"
+                                                android:textSize="13sp" />
+                                            <Switch
+                                                android:id="@+id/settingsMemoryUseLlmExtractSwitch"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="10dp"
+                                                android:text="LLM 提取事实"
+                                                android:textColor="@color/text"
+                                                android:textSize="13sp" />
+                                            <Switch
+                                                android:id="@+id/settingsEntityEnabledSwitch"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="10dp"
+                                                android:text="实体记忆"
+                                                android:textColor="@color/text"
+                                                android:textSize="13sp" />
+                                                <Switch
+                                                    android:id="@+id/enableDoubaoTtsSwitch"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="启用 Doubao TTS"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+                                                <Switch
+                                                    android:id="@+id/enableDoubaoAsrSwitch"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="启用 Doubao ASR"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+                                                <Switch
+                                                    android:id="@+id/settingsUseMemoryToolsSwitch"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="AI 工具自管记忆"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+                                                <Switch
+                                                    android:id="@+id/settingsWebSearchSwitch"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="联网搜索"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="14dp"
+                                                    android:text="🔔 提示音"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="14sp"
+                                                    android:textStyle="bold" />
+                                                <Switch
+                                                    android:id="@+id/settingsGroupNotifySwitch"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="6dp"
+                                                    android:text="群聊结束提示音"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+                                                <LinearLayout
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:orientation="horizontal">
+                                                    <TextView
+                                                        android:id="@+id/settingsGroupSoundButton"
+                                                        android:layout_width="0dp"
+                                                        android:layout_height="wrap_content"
+                                                        android:layout_weight="1"
+                                                        android:background="@drawable/btn_secondary"
+                                                        android:gravity="center_vertical"
+                                                        android:paddingStart="12dp"
+                                                        android:paddingEnd="12dp"
+                                                        android:paddingTop="11dp"
+                                                        android:paddingBottom="11dp"
+                                                        android:text="群聊提示音：跟随系统默认 ▶"
+                                                        android:textColor="@color/accent"
+                                                        android:textSize="13sp" />
+                                                    <TextView
+                                                        android:id="@+id/settingsGroupSoundTest"
+                                                        android:layout_width="wrap_content"
+                                                        android:layout_height="wrap_content"
+                                                        android:layout_marginStart="6dp"
+                                                        android:background="@drawable/btn_secondary"
+                                                        android:paddingStart="14dp"
+                                                        android:paddingEnd="14dp"
+                                                        android:paddingTop="11dp"
+                                                        android:paddingBottom="11dp"
+                                                        android:text="🔊 试听"
+                                                        android:textColor="@color/accent"
+                                                        android:textSize="13sp" />
+                                                </LinearLayout>
+                                                <Switch
+                                                    android:id="@+id/settingsChatNotifySwitch"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="单聊回复提示音"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+                                                <LinearLayout
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:orientation="horizontal">
+                                                    <TextView
+                                                        android:id="@+id/settingsChatSoundButton"
+                                                        android:layout_width="0dp"
+                                                        android:layout_height="wrap_content"
+                                                        android:layout_weight="1"
+                                                        android:background="@drawable/btn_secondary"
+                                                        android:gravity="center_vertical"
+                                                        android:paddingStart="12dp"
+                                                        android:paddingEnd="12dp"
+                                                        android:paddingTop="11dp"
+                                                        android:paddingBottom="11dp"
+                                                        android:text="单聊提示音：跟随系统默认 ▶"
+                                                        android:textColor="@color/accent"
+                                                        android:textSize="13sp" />
+                                                    <TextView
+                                                        android:id="@+id/settingsChatSoundTest"
+                                                        android:layout_width="wrap_content"
+                                                        android:layout_height="wrap_content"
+                                                        android:layout_marginStart="6dp"
+                                                        android:background="@drawable/btn_secondary"
+                                                        android:paddingStart="14dp"
+                                                        android:paddingEnd="14dp"
+                                                        android:paddingTop="11dp"
+                                                        android:paddingBottom="11dp"
+                                                        android:text="🔊 试听"
+                                                        android:textColor="@color/accent"
+                                                        android:textSize="13sp" />
+                                                </LinearLayout>
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="16dp"
+                                                    android:text="工作音效"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <Switch
+                                                    android:id="@+id/workSoundMasterSwitch"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="6dp"
+                                                    android:text="总开关"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+                                                <LinearLayout
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:gravity="center_vertical"
+                                                    android:orientation="horizontal">
+                                                    <TextView
+                                                        android:layout_width="wrap_content"
+                                                        android:layout_height="wrap_content"
+                                                        android:text="音量"
+                                                        android:textColor="@color/text"
+                                                        android:textSize="13sp" />
+                                                    <SeekBar
+                                                        android:id="@+id/workSoundVolumeBar"
+                                                        android:layout_width="0dp"
+                                                        android:layout_height="wrap_content"
+                                                        android:layout_marginStart="10dp"
+                                                        android:layout_weight="1"
+                                                        android:max="100" />
+                                                </LinearLayout>
+                                                <LinearLayout
+                                                    android:id="@+id/workSoundRow0"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="8dp"
+                                                    android:gravity="center_vertical"
+                                                    android:orientation="horizontal" />
+                                                <LinearLayout
+                                                    android:id="@+id/workSoundRow1"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:gravity="center_vertical"
+                                                    android:orientation="horizontal" />
+                                                <LinearLayout
+                                                    android:id="@+id/workSoundRow2"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:gravity="center_vertical"
+                                                    android:orientation="horizontal" />
+                                                <LinearLayout
+                                                    android:id="@+id/workSoundRow3"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:gravity="center_vertical"
+                                                    android:orientation="horizontal" />
+                                                <LinearLayout
+                                                    android:id="@+id/workSoundRow4"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:gravity="center_vertical"
+                                                    android:orientation="horizontal" />
+
+                                                <LinearLayout
+                                                    android:id="@+id/workSoundRow5"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:gravity="center_vertical"
+                                                    android:orientation="horizontal" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="搜索 API 地址（可选）"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsWebSearchApiUrl"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:inputType="textUri"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="14dp"
+                                                    android:text="搜索服务地址"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsTokeniqBaseUrl"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 https://my-search-api.example.com"
+                                                    android:inputType="textUri"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="搜索服务密钥"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsTokeniqApiKey"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 sk-wb-xxxxx"
+                                                    android:inputType="text"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="12dp"
+                                                    android:visibility="gone"
+                                                    android:text="🔑 搜索密钥池"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsSearchKeyPool"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:visibility="gone"
+                                                    android:background="@drawable/bg_edit"
+                                                    android:gravity="top|start"
+                                                    android:hint="https://my-search-api.example.com|sk-xxxx&#10;sk-yyyy&#10;https://其他地址/v1|sk-zzzz"
+                                                    android:inputType="textMultiLine"
+                                                    android:minLines="3"
+                                                    android:maxLines="8"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:paddingTop="10dp"
+                                                    android:paddingBottom="10dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="12sp" />
+                                                <TextView
+                                                    android:id="@+id/settingsPoolStatus"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:visibility="gone"
+                                                    android:text="池子状态：未启用"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:visibility="gone"
+                                                    android:text="池内密钥冷却（秒）"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsPoolCooldown"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                                                    android:visibility="gone"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 10"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="每次搜索条数"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsTokeniqSearchCount"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 8"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="搜索时间范围（可选）"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsTokeniqFreshness"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:inputType="text"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="搜索频率限制"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsSearchMinGap"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 8"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="每分钟搜索上限"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsSearchPerMinute"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 6"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                                                <Button
+                                                    android:id="@+id/testSearchServiceButton"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="8dp"
+                    android:background="@drawable/btn_secondary"
+                    android:minHeight="44dp"
+                                                    android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                                                    android:text="🧪 测试搜索服务"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+
+                                                <Button
+                                                    android:id="@+id/overlayPermissionButton"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                    android:background="@drawable/btn_secondary"
+                    android:minHeight="44dp"
+                                                    android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                                                    android:text="🌀 后台运行 / 熄屏继续跑"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="12sp" />
+
+
+                                                <Button
+                                                    android:id="@+id/imeChannelButton"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:background="@drawable/btn_secondary"
+                                                    android:minHeight="44dp"
+                                                    android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                                                    android:text="⌨️ 打字通道"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="12sp" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/collapseHeader_model"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                    android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="13dp"
+                        android:paddingBottom="13dp">
+                        <TextView
+                            android:id="@+id/collapseArrow_model"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:text="▾"
+                            android:textColor="@color/accent"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="② 模型与 API"
+                            android:textColor="@color/text"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/collapseContent_model"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                    android:background="@drawable/card"
+                        android:orientation="vertical"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:visibility="visible">
+
+                                            
+
+                                                                                        <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="26dp"
+                                                android:paddingTop="10dp"
+                                                android:paddingBottom="8dp"
+                                                android:text="🔊 语音合成（TTS）API 设置"
+                                                android:textColor="@color/accent"
+                                                android:textSize="15sp"
+                                                android:textStyle="bold" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="语音合成模型"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsTtsModel"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 tts-1 / cosyvoice-v1"
+                                                android:inputType="text"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="语音合成音色"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsTtsVoice"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 alloy / cherry"
+                                                android:inputType="text"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="14dp"
+                                                android:text="腾讯云语音合成"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <Switch
+                                                android:id="@+id/settingsTencentTtsSwitch"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="6dp"
+                                                android:text="启用腾讯云 TTS"
+                                                android:textColor="@color/text"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="8dp"
+                                                android:text="SecretId"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsTencentSecretId"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="AKID…"
+                                                android:inputType="text"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="8dp"
+                                                android:text="SecretKey"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsTencentSecretKey"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="SecretKey"
+                                                android:inputType="textPassword"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="8dp"
+                                                android:text="音色 ID"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsTencentVoice"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="101006"
+                                                android:inputType="number"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="8dp"
+                                                android:text="地域 / 语速"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <LinearLayout
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="4dp"
+                                                android:orientation="horizontal">
+                                                <EditText
+                                                    android:id="@+id/settingsTencentRegion"
+                                                    android:layout_width="0dp"
+                                                    android:layout_height="48dp"
+                                                    android:layout_weight="1"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="ap-guangzhou"
+                                                    android:inputType="text"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsTencentSpeed"
+                                                    android:layout_width="0dp"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginStart="8dp"
+                                                    android:layout_weight="1"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="语速 0"
+                                                    android:inputType="numberSigned|numberDecimal"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                                            </LinearLayout>
+                                            <Button
+                                                android:id="@+id/tencentTtsTestButton"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="42dp"
+                                                android:layout_marginTop="8dp"
+                                                android:background="@drawable/btn_secondary"
+                                                android:text="试听腾讯云音色"
+                                                android:textColor="@color/accent"
+                                                android:textSize="13sp" />
+
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="12dp"
+                                                android:text="TTS 密钥池"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsTtsKeyPool"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="120dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:gravity="top|start"
+                                                android:hint="# 每行一个，例如：&#10;dashscope|sk-xxxx&#10;doubao|appid:accesskey&#10;openai|https://api.siliconflow.cn/v1|sk-xxxx|模型名|音色"
+                                                android:inputType="textMultiLine"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:paddingTop="10dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="12sp" />
+                                            <TextView
+                                                android:id="@+id/ttsPoolStatus"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="6dp"
+                                                android:textColor="@color/accent"
+                                                android:textSize="11sp" />
+                                                                                        <LinearLayout
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="6dp"
+                                                android:orientation="horizontal">
+                                                <Button
+                                                    android:id="@+id/ttsPoolSaveButton"
+                                                    android:layout_width="0dp"
+                                                    android:layout_height="42dp"
+                                                    android:layout_weight="1"
+                                                    android:background="@drawable/btn_secondary"
+                                                    android:text="保存密钥池"
+                                                    android:textColor="@color/accent"
+                                                    android:textSize="13sp" />
+                                                <Button
+                                                    android:id="@+id/ttsPoolResetButton"
+                                                    android:layout_width="0dp"
+                                                    android:layout_height="42dp"
+                                                    android:layout_marginStart="8dp"
+                                                    android:layout_weight="1"
+                                                    android:background="@drawable/btn_secondary"
+                                                    android:text="重试所有密钥"
+                                                    android:textColor="@color/accent"
+                                                    android:textSize="13sp" />
+                                            </LinearLayout>
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="池内冷却（秒）"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsTtsPoolCooldownEdit"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="10"
+                                                android:inputType="number"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="26dp"
+                                                android:paddingTop="10dp"
+                                                android:paddingBottom="8dp"
+                                                android:text="🧭 Embedding（向量化）API 设置"
+                                                android:textColor="@color/accent"
+                                                android:textSize="15sp"
+                                                android:textStyle="bold" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="Embedding 模型名"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsEmbeddingModel"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 text-embedding-3-small"
+                                                android:inputType="text"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+
+                                                <Button
+                                                    android:id="@+id/pickEmbeddingProviderButton"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="42dp"
+                                                    android:layout_marginTop="6dp"
+                                                    android:background="@drawable/btn_secondary"
+                                                    android:minHeight="0dp"
+                                                    android:minWidth="0dp"
+                                                    android:text="选择模型"
+                                                    android:textColor="@color/accent"
+                                                    android:textSize="12sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="Embedding API 地址"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsEmbeddingBaseUrl"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:inputType="textUri"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="Embedding API Key"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsEmbeddingApiKey"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:inputType="textPassword"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="音色"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+
+                                                <Button
+                                                    android:id="@+id/doubaoSpeakerButton"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/btn_secondary"
+                    android:minHeight="44dp"
+                                                    android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                                                    android:text="🎙 切换音色"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+
+                                                <Button
+                                                    android:id="@+id/doubaoSpeakerProbeButton"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_secondary"
+                    android:minHeight="44dp"
+                                                    android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                                                    android:text="🔍 自动探测可用音色"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="应用 ID"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/doubaoAppIdEditText"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 1234567890"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="Access Key"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/doubaoAccessKeyEditText"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="Access Token"
+                                                    android:inputType="textPassword"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="API Key（新版控制台 · 填了就走双向流式，首字更快）"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/doubaoApiKeyEditText"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="X-Api-Key（留空则用上面的 AppId + Access Key 走单向 HTTP）"
+                                                    android:inputType="textPassword"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="26dp"
+                                                    android:paddingTop="10dp"
+                                                    android:paddingBottom="8dp"
+                                                    android:text="🖼️ 图片识别（Vision）API 设置"
+                                                    android:textColor="@color/accent"
+                                                    android:textSize="15sp"
+                                                    android:textStyle="bold" />
+                                                <Switch
+                                                    android:id="@+id/settingsVisionUseMainModel"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="4dp"
+                                                    android:text="用主对话模型识图"
+                                                    android:textColor="@color/text"
+                                                    android:textSize="13sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="图片识别 API 地址"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsVisionBaseUrl"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 https://dashscope.aliyuncs.com/compatible-mode/v1"
+                                                    android:inputType="textUri"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="图片识别模型名"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsVisionModel"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 shijue"
+                                                    android:inputType="text"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                                                <Button
+                                                    android:id="@+id/pickVisionProviderButton"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="42dp"
+                                                    android:layout_marginTop="6dp"
+                                                    android:background="@drawable/btn_secondary"
+                                                    android:minHeight="0dp"
+                                                    android:minWidth="0dp"
+                                                    android:text="选择模型"
+                                                    android:textColor="@color/accent"
+                                                    android:textSize="12sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="图片识别 API Key"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsVisionApiKey"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="sk-..."
+                                                    android:inputType="textPassword"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+
+                        <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="26dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="8dp"
+                        android:text="🗺️ 内置地图 / 导航（高德）"
+                        android:textColor="@color/accent"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                        <EditText
+                        android:id="@+id/settingsAmapApiKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_edit"
+                        android:hint="高德 Android 平台 Key"
+                        android:inputType="textPassword"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text"
+                        android:textColorHint="@color/muted"
+                        android:textSize="13sp" />
+                        <TextView
+                        android:id="@+id/amapSha1Text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_edit"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:text="本机签名 SHA1：读取中…"
+                        android:textColor="@color/text"
+                        android:textSize="11sp" />
+
+
+
+                                                
+
+                                                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="26dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="8dp"
+                        android:text="🎭 人格蒸馏模型设置"
+                        android:textColor="@color/accent"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                        <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="蒸馏模型"
+                        android:textColor="@color/muted"
+                        android:textSize="11sp" />
+                        <EditText
+                        android:id="@+id/personaModelEdit"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_edit"
+                        android:hint="模型名，如 deepseek-v4-flash-0731"
+                        android:inputType="text"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text"
+                        android:textColorHint="@color/muted"
+                        android:textSize="12sp" />
+
+                        <Button
+                        android:id="@+id/pickPersonaProviderButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="32dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/btn_secondary"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:text="选择模型"
+                        android:textColor="@color/accent"
+                        android:textSize="12sp" />
+                        <Button
+                        android:id="@+id/personaThinkButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="32dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/btn_secondary"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:text="🧠 思考档位：关"
+                        android:textColor="@color/accent"
+                        android:textSize="12sp" />
+
+                        <EditText
+                        android:id="@+id/personaBaseUrlEdit"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_edit"
+android:hint="蒸馏模型接口地址"
+                        android:inputType="textUri"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text"
+                        android:textColorHint="@color/muted"
+                        android:textSize="12sp" />
+                        <Button
+                        android:id="@+id/personaSaveModelButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/btn_secondary"
+                        android:minHeight="0dp"
+                        android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                        android:text="💾 保存蒸馏模型配置"
+                        android:textColor="@color/accent"
+                        android:textSize="13sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="26dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="8dp"
+                        android:text="🧠 记忆整理模型设置"
+                        android:textColor="@color/accent"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                        <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="专门把你们的对话整理进长期记忆（新增 / 更新 / 合并）。和主对话分开，可以挑更便宜或更强的模型；留空就用主对话的模型。"
+                        android:textColor="@color/muted"
+                        android:textSize="11sp"
+                        android:lineSpacingExtra="2dp" />
+
+                        <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:text="记忆整理模型"
+                        android:textColor="@color/muted"
+                        android:textSize="11sp" />
+
+                        <EditText
+                        android:id="@+id/memoryModelEdit"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_edit"
+                        android:hint="留空 = 用主对话模型"
+                        android:inputType="text"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text"
+                        android:textColorHint="@color/muted"
+                        android:textSize="13sp" />
+
+                        <Button
+                        android:id="@+id/pickMemoryProviderButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="32dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/btn_secondary"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:text="选择模型"
+                        android:textColor="@color/accent"
+                        android:textSize="12sp" />
+                        <Button
+                        android:id="@+id/memoryThinkButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="32dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/btn_secondary"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:text="🧠 思考档位：关"
+                        android:textColor="@color/accent"
+                        android:textSize="12sp" />
+
+                        <EditText
+                        android:id="@+id/memoryBaseUrlEdit"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_edit"
+                        android:hint="请求地址（留空 = 用主对话的）"
+                        android:inputType="text"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text"
+                        android:textColorHint="@color/muted"
+                        android:textSize="13sp" />
+
+
+                        <Button
+                        android:id="@+id/memorySaveModelButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/btn_secondary"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:text="保存记忆模型配置"
+                        android:textColor="@color/accent"
+                        android:textSize="13sp" />
+
+                        <Button
+                        android:id="@+id/memoryScanAllButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/btn_secondary"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:text="全量扫描历史对话"
+                        android:textColor="@color/accent"
+                        android:textSize="13sp" />
+
+                        <TextView
+                        android:id="@+id/memoryScanStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textColor="@color/muted"
+                        android:textSize="11sp" />
+                    </LinearLayout>
+
+                        <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="26dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="8dp"
+                        android:text="🗜️ 会话压缩模型设置"
+                        android:textColor="@color/accent"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                        <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:text="会话压缩"
+                        android:textColor="@color/muted"
+                        android:textSize="11sp" />
+
+                        <EditText
+                        android:id="@+id/compactModelEdit"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_edit"
+                        android:hint="压缩模型名，如 deepseek-v4-flash-0731"
+                        android:inputType="text"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text"
+                        android:textColorHint="@color/muted"
+                        android:textSize="13sp" />
+
+                        <Button
+                        android:id="@+id/pickCompactProviderButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="32dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/btn_secondary"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:text="选择模型"
+                        android:textColor="@color/accent"
+                        android:textSize="12sp" />
+                        <Button
+                        android:id="@+id/compactThinkButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="32dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/btn_secondary"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:text="🧠 思考档位：关"
+                        android:textColor="@color/accent"
+                        android:textSize="12sp" />
+
+                        <EditText
+                        android:id="@+id/compactBaseUrlEdit"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_edit"
+android:hint="压缩模型请求地址"
+                        android:inputType="text"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/text"
+                        android:textColorHint="@color/muted"
+                        android:textSize="13sp" />
+
+
+                        <Button
+                        android:id="@+id/compactSaveModelButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/btn_secondary"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:text="保存压缩模型配置"
+                        android:textColor="@color/accent"
+                        android:textSize="13sp" />
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:id="@+id/collapseHeader_param"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                    android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="13dp"
+                        android:paddingBottom="13dp">
+                        <TextView
+                            android:id="@+id/collapseArrow_param"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:text="▸"
+                            android:textColor="@color/accent"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="③ 参数与预算"
+                            android:textColor="@color/text"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/collapseContent_param"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                    android:background="@drawable/card"
+                        android:orientation="vertical"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:visibility="gone">
+
+
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="朗读速度"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsRate"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 1.0"
+                                                android:inputType="numberDecimal"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="系统提示词"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsSystemPrompt"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="88dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:gravity="top"
+                                                android:hint="例如：你是lin渊，回答要简短口语化…"
+                                                android:inputType="textMultiLine"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp"
+                                                android:scrollbars="vertical"
+                                                android:scrollbarStyle="insideOverlay"
+                                                android:overScrollMode="ifContentScrolls" />
+
+                                            <Button
+                                                android:id="@+id/expandSystemPromptButton"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_secondary"
+                    android:minHeight="40dp"
+                                                android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                                                android:text="⤢ 全屏编辑系统提示词"
+                                                android:textColor="@color/text"
+                                                android:textSize="13sp" />
+
+                                            <Button
+                                                android:id="@+id/previewSystemPromptButton"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_secondary"
+                    android:minHeight="40dp"
+                                                android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                                                android:text="👁 预览最终提示词"
+                                                android:textColor="@color/text"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="Temperature"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsTemperature"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 0.6"
+                                                android:inputType="numberDecimal"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="Top-P"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsTopP"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 1.0"
+                                                android:inputType="numberDecimal"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="Max Tokens"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsMaxTokens"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 4000"
+                                                android:inputType="number"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="频率惩罚"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsFrequencyPenalty"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+android:hint="例如 0"
+                                                android:inputType="numberDecimal|numberSigned"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="存在惩罚"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsPresencePenalty"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+android:hint="例如 0"
+                                                android:inputType="numberDecimal|numberSigned"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="连接超时（毫秒）"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsConnectTimeout"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 20000（20秒）"
+                                                android:inputType="number"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="读取超时（毫秒）"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsReadTimeout"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+android:hint="例如 120000"
+                                                android:inputType="number"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="时间衰减"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsMemoryTimeDecay"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 0.9"
+                                                android:inputType="numberDecimal"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="记忆提取 max_tokens"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsMemoryExtractMaxTokens"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 2000"
+                                                android:inputType="number"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="记忆提取 Temperature"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsMemoryExtractTemperature"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 0.1"
+                                                android:inputType="numberDecimal"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="记忆评分权重"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp"
+                                                android:textStyle="bold" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="6dp"
+                                                android:text="重要性权重"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsMemoryWeightImportance"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 0.3"
+                                                android:inputType="numberDecimal"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="向量权重"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsMemoryWeightVector"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 0.5"
+                                                android:inputType="numberDecimal"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="10dp"
+                                                android:text="时间权重"
+                                                android:textColor="@color/muted"
+                                                android:textSize="11sp" />
+                                            <EditText
+                                                android:id="@+id/settingsMemoryWeightTime"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="48dp"
+                                                android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                android:hint="例如 0.2"
+                                                android:inputType="numberDecimal"
+                                                android:paddingStart="12dp"
+                                                android:paddingEnd="12dp"
+                                                android:textColor="@color/text"
+                                                android:textColorHint="@color/muted"
+                                                android:textSize="13sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="总上下文窗口容量"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsContextBudgetTokens"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 1000000"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="长期记忆(AI笔记) token 预算"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsMemoryStoreBudgetTokens"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 400000"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="短期记忆(当前对话) token 预算"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsShortTermBudgetTokens"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 400000"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                                                
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="它的记忆 token 预算"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsSelfStoreBudgetTokens"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 100000"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="旧对话检索条数上限"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsMemorySearchLimit"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 20"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                                                <TextView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginTop="10dp"
+                                                    android:text="工具调用最大轮数"
+                                                    android:textColor="@color/muted"
+                                                    android:textSize="11sp" />
+                                                <EditText
+                                                    android:id="@+id/settingsMaxToolIterations"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="48dp"
+                                                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                                                    android:hint="例如 4"
+                                                    android:inputType="number"
+                                                    android:paddingStart="12dp"
+                                                    android:paddingEnd="12dp"
+                                                    android:textColor="@color/text"
+                                                    android:textColorHint="@color/muted"
+                                                    android:textSize="13sp" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/collapseHeader_persona"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                    android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="13dp"
+                        android:paddingBottom="13dp">
+                        <TextView
+                            android:id="@+id/collapseArrow_persona"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:text="▸"
+                            android:textColor="@color/accent"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="④ 自我蒸馏"
+                            android:textColor="@color/text"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/collapseContent_persona"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                    android:background="@drawable/card"
+                        android:orientation="vertical"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:visibility="gone">
+                        <TextView
+                            android:id="@+id/personaStatusText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                    android:background="@drawable/bg_panel"
+                            android:padding="12dp"
+                            android:text="尚未蒸馏。"
+                            android:textColor="@color/text"
+                            android:textSize="12sp" />
+                        <Switch
+                            android:id="@+id/personaDistillSwitch"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="10dp"
+                            android:text="自动蒸馏"
+                            android:textColor="@color/text"
+                            android:textSize="13sp" />
+                        <Button
+                            android:id="@+id/personaDistillNowButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_primary"
+                    android:minHeight="44dp"
+                            android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                            android:text="⚗️ 立即蒸馏"
+                            android:textColor="@color/onAccent"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                        <Button
+                            android:id="@+id/personaViewButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_secondary"
+                    android:minHeight="44dp"
+                            android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                            android:text="📄 查看完整人格档案"
+                            android:textColor="@color/accent"
+                            android:textSize="13sp" />
+                        <Button
+                            android:id="@+id/personaClearButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:minHeight="44dp"
+                            android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                            android:text="🗑 清除档案"
+                            android:textColor="@color/danger"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/collapseHeader_voiceprint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                    android:background="@drawable/card"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="13dp"
+                        android:paddingBottom="13dp">
+                        <TextView
+                            android:id="@+id/collapseArrow_voiceprint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:text="▸"
+                            android:textColor="@color/accent"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⑤ 声纹"
+                            android:textColor="@color/text"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/collapseContent_voiceprint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                    android:background="@drawable/card"
+                        android:orientation="vertical"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:visibility="gone">
+                        <TextView
+                            android:id="@+id/vrStatusText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                    android:background="@drawable/bg_panel"
+                            android:padding="12dp"
+                            android:text="未注册"
+                            android:textColor="@color/text"
+                            android:textSize="13sp" />
+                        <Button
+                            android:id="@+id/vrEnrollButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                    android:background="@drawable/btn_secondary"
+                    android:minHeight="44dp"
+                            android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                            android:text="🎤 注册声纹"
+                            android:textColor="@color/text"
+                            android:textSize="14sp" />
+                        <Button
+                            android:id="@+id/vrTestButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:minHeight="44dp"
+                            android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                            android:text="✔️ 测试声纹"
+                            android:textColor="@color/accent"
+                            android:textSize="14sp" />
+                        <Button
+                            android:id="@+id/vrClearButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:minHeight="44dp"
+                            android:paddingStart="14dp"
+                                                    android:paddingEnd="14dp"
+                            android:text="🗑 清除声纹"
+                            android:textColor="@color/accent"
+                            android:textSize="14sp" />
+                        <Switch
+                            android:id="@+id/vrEnableSwitch"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="10dp"
+                            android:text="通话时验证声纹"
+                            android:textColor="@color/text"
+                            android:textSize="13sp" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="灵敏度"
+                            android:textColor="@color/muted"
+                            android:textSize="11sp" />
+                        <EditText
+                            android:id="@+id/vrThresholdEdit"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_edit"
+                            android:hint="例如 0.60"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:textColor="@color/text"
+                            android:textColorHint="@color/muted"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/settingsHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_panel"
+                        android:lineSpacingExtra="3dp"
+                        android:padding="14dp"
+                        android:textColor="@color/muted"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/saveSettingsButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="14dp"
+                    android:background="@drawable/btn_primary"
+                        android:text="保存设置"
+                        android:textColor="#06150C"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+    </FrameLayout>
+
+
+
+</LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/headerColumn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="2dp"
+        android:paddingEnd="6dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/headerTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingEnd="16dp"
+                android:paddingStart="2dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="lin渊"
+                android:textColor="@color/text"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="0dp"
+                android:text=""
+                android:textColor="@color/muted"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/headerActions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

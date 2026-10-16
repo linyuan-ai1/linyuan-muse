@@ -1,0 +1,66 @@
+================================================================
+名人思维角色档案 — 第三方开源许可（MIT License）
+================================================================
+
+本 App 内置的 8 位「名人思维」角色（芒格 / 费曼 / 贝索斯 / 乔布斯 /
+马斯克 / 稻盛和夫 / 巴菲特 / 塔勒布）的完整人格档案，来自以下开源项目：
+
+  alchaincyf/steve-jobs-skill
+  alchaincyf/munger-skill
+  alchaincyf/feynman-skill
+  alchaincyf/elon-musk-skill
+  alchaincyf/taleb-skill
+  nuwa-skills/buffett-skill
+  nuwa-skills/inamori-skill
+  nuwa-skills/bezos-skill
+
+原项目地址：https://github.com/alchaincyf
+            https://github.com/nuwa-skills
+
+----------------------------------------------------------------
+MIT License
+
+Copyright (c) 2026 Huashu (花叔)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+----------------------------------------------------------------
+
+说明：原始 SKILL.md 中包含的 agent 工作流部分（联网研究步骤、自检清单、
+失败模式 fallback 树等）是给命令行 agent 用的，本 App 已剔除；保留的是
+人格档案本体（身份卡 / 核心心智模型 / 决策启发式 / 表达 DNA /
+价值观与反模式 / 智识谱系 / 诚实边界）。
+
+================================================================
+补充：工程师思维角色（2026-09-15 新增）
+================================================================
+
+以下 8 位工程师/技术思想家的人格档案同样来自「女娲 / 花叔」生态（MIT）：
+
+  alchaincyf/karpathy-skill          （Andrej Karpathy，master 分支）
+  nuwa-skills/torvalds-skill         （Linus Torvalds）
+  nuwa-skills/knuth-skill            （Donald Knuth 高德纳）
+  nuwa-skills/turing-skill           （Alan Turing 图灵）
+  nuwa-skills/zhangxiaolong-skill    （张小龙）
+  nuwa-skills/wujun-skill            （吴军）
+  nuwa-skills/shannon-skill          （Claude Shannon 香农）
+  nuwa-skills/vonneumann-skill       （John von Neumann 冯·诺依曼）
+
+其中 torvalds-skill 的 LICENSE 标注为 Copyright (c) 2026 Panmax（社区贡献者），
+其余为 Copyright (c) 2026 Huashu (花叔)。均为 MIT License，条款同上。
+================================================================

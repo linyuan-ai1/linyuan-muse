@@ -1,0 +1,17 @@
+build/
+.gradle/
+.recovery/
+.verify/
+local.properties
+*.iml
+.idea/
+
+# ZCode 工作目录（我的测试/备份产物，不进仓库）
+.zcode/
+*.bak_before_merge
+*.pre_insert
+
+# 本机构建/调试产物
+hs_err_pid*.log
+*.db
+.playwright-mcp/

@@ -1,0 +1,63 @@
+================================================================
+开发全流程角色 — 第三方开源许可
+================================================================
+
+本 App 内置的「软件开发全流程」角色提示词，来自以下开源项目：
+
+  jnMetaCode/agency-orchestrator
+    https://github.com/jnMetaCode/agency-orchestrator
+    许可：Apache License 2.0
+
+  上游项目：msitarzewski/agency-agents
+    https://github.com/msitarzewski/agency-agents
+    许可：MIT License, Copyright (c) 2025 AgentLand Contributors
+
+涉及的角色（中文版，来自 agency-orchestrator 的 website/public/prompts/zh/）：
+  产品经理 / 趋势研究员 / 软件架构师 / 后端架构师 / 前端开发 /
+  UI设计师 / UX架构师 / UX研究员 / 代码审查员 / 安全工程师 /
+  SRE / 技术文档工程师 / 微信小程序开发 / 移动应用开发 /
+  API测试 / 现实校验 / 性能基准测试 / 可访问性审计 /
+  合规审计 / 法务合规 / 政务数字化售前 / 中国市场本地化 / 智能体编排
+
+原提示词未做实质修改（仅去除个别与命令行 agent 环境相关的片段）。
+
+----------------------------------------------------------------
+Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+----------------------------------------------------------------
+
+MIT License (upstream agency-agents)
+
+Copyright (c) 2025 AgentLand Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+================================================================

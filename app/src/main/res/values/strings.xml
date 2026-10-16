@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">lin渊</string>
+    <string name="accessibility_desc">允许 lin渊 读取屏幕内容并模拟点击/滑动/返回等操作，用于在任意应用中帮你操作（例如打开设置、点按钮、输入文字）。</string>
+
+
+    <string name="ime_label">lin渊打字通道</string>
+    <string name="ime_subtype_label">lin渊打字通道（AI 用）</string>
+</resources>

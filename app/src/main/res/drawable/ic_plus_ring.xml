@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- 输入条右侧的「加号」按钮（输入框为空时显示）：实心圆 + 白色十字，与发送按钮同族 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/accent" />
+        </shape>
+    </item>
+
+    <item
+        android:width="13dp"
+        android:height="2dp"
+        android:gravity="center">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/onAccent" />
+            <corners android:radius="1dp" />
+        </shape>
+    </item>
+
+    <item
+        android:width="2dp"
+        android:height="13dp"
+        android:gravity="center">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/onAccent" />
+            <corners android:radius="1dp" />
+        </shape>
+    </item>
+</layer-list>

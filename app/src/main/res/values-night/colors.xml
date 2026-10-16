@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#0B0F1A</color>
+    <color name="surface">#141A28</color>
+    <color name="surfaceInput">#1A2233</color>
+    <color name="surfaceElevated">#182031</color>
+    <color name="border">#273349</color>
+    <color name="borderStrong">#33415C</color>
+    <color name="divider">#222C40</color>
+    <color name="text">#EAF0FB</color>
+    <color name="text2">#C6D2E6</color>
+    <color name="muted">#9AACC6</color>
+    <color name="faint">#6E7E99</color>
+    <color name="fainter">#55637C</color>
+    <color name="accent">#4C8DFF</color>
+    <color name="accentBright">#6AA4FF</color>
+    <color name="accentSoft">#16233C</color>
+    <color name="accentLine">#404C8DFF</color>
+    <color name="onAccent">#05132B</color>
+    <color name="userBubble">#2C5AC0</color>
+    <color name="userBubbleText">#EAF0FB</color>
+    <color name="aiBubble">#141A28</color>
+    <color name="aiBubbleText">#EAF0FB</color>
+    <color name="danger">#FF6B6B</color>
+    <color name="dangerSoft">#2A1620</color>
+    <color name="navBar">#0E1420</color>
+    <color name="navActive">#6AA4FF</color>
+    <color name="navInactive">#6E7E99</color>
+    <color name="panel">#141A28</color>
+    <color name="panel2">#141A28</color>
+    <color name="glow">#4C8DFF</color>
+
+
+    <color name="cardDepth">#2C3A54</color>
+
+    <color name="btnSecondaryDepth">#2A4270</color>
+
+    <color name="btnPrimaryDepth">#6AA4FF</color>
+
+    <color name="btnGhostDepth">#33415C</color>
+
+    <!-- 输入条底面的"深一档"：深色主题下必须给深值。
+         不定义就会回落到 values/ 的 #D5CDBE（米白），输入框下缘会露一条泛白带。 -->
+    <color name="inputBarDepth">#232D42</color>
+
+    <color name="btnDangerDepth">#8A3A46</color>
+</resources>

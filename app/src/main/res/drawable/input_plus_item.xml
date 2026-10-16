@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- 加号面板里的单个选项（图标 + 文字），按下时浅蓝底 -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/accentSoft">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</ripple>
