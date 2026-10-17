@@ -111,7 +111,7 @@ public class AppDatabase extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "voice_companion.db";
 
-    private static final int DB_VERSION = 59;
+    private static final int DB_VERSION = 60;
 
     public AppDatabase(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -206,7 +206,10 @@ public class AppDatabase extends SQLiteOpenHelper {
                 + "source TEXT,"
                 + "chunk_index INTEGER DEFAULT 0,"
                 + "embedding BLOB,"
-                + "created_at INTEGER NOT NULL)");
+                + "created_at INTEGER NOT NULL,"
+                // sent_at = 用户**发送这份文档**的时间（跟对话解耦：删对话也不影响它）。
+                // created_at 是"切块入库"的时间（补录时会变成今天），两者不是一回事。
+                + "sent_at INTEGER DEFAULT 0)");
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_knowledge_title ON knowledge(title)");
         try { db.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS knowledge_fts USING fts5(chunk, tokenize='unicode61')"); } catch (Exception ignored) {}
 
@@ -401,6 +404,21 @@ public class AppDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        if (oldVersion < 60) {
+            // 知识库文档的"发送时间"（2026-10-17）：卡片上要显示用户**发文档**的时间，
+            // 而不是切块入库的时间（补录后入库时间会变成今天，看着像"我刚发的"）。
+            // 存在 knowledge 自己这一列里 —— 不从 messages 取，删对话也不会丢。
+            //
+            // 这里**只加列，不做回填**。曾经在这里写过
+            // "UPDATE knowledge SET sent_at = (关联子查询扫 messages)"，那是
+            // 1077 行 × 全表 LIKE 扫描（messages 正文 3.5 MB）≈ 3.8 GB 的读：
+            // 真机跑满 60 秒 → 把 MY_PACKAGE_REPLACED 广播拖成 ANR 超时 → 进程被杀 →
+            // 整个 onUpgrade 事务回滚 → user_version 永远停在 59，列永远加不上。
+            // 升级路径上只能有 O(1) 的 DDL。回填在 MainActivity 的后台任务里做
+            //（见 backfillKnowledgeSentAtOnce：5 条消息、每份文档一条 UPDATE，走 title 索引）。
+            addColumnIfMissing(db, "knowledge", "sent_at", "INTEGER DEFAULT 0");
+        }
 
         if (oldVersion < 59) {
             createPerceptionTables(db);
@@ -1601,18 +1619,26 @@ public class AppDatabase extends SQLiteOpenHelper {
         public long conversationId;
         public int count;
         public String preview = "";
+        /** 该会话**第一条**消息的时间。列表显示它、也按它排序 —— 两处必须同一个口径，
+         *  否则跨天会话会出现"显示 10-12、却排在 10-13 前面"这种看起来没排好的列表。 */
         public long firstCreatedAt;
         public String note;
     }
 
     public List<ConversationSummary> listConversations() {
+        // 按"最后一条消息的时间"排，**最新在前**（用户 2026-10-16 定）。
+        // 旧写法是 ORDER BY conversation_id —— 那是"会话号的分配顺序"，不是时间：
+        // 会话号是按消息行号 +1 发的，助手面板那批 90 万号段（10-09~10-14）
+        // 数值上比 10-16 的新会话还大，于是新会话被排到了最底下、看着像"混在中间"。
+        // 另外旧写法是升序 = 最旧的在最上面，与"打开就该看到最近的"正好相反。
+        // 这里必须把会话号原样带出来，所以不用 ORDER BY 表达式，改成取回后按时间排序。
         List<ConversationSummary> out = new ArrayList<>();
         Cursor c = null;
         try {
             c = getReadableDatabase().rawQuery(
                     "SELECT conversation_id, COUNT(*) FROM messages"
                             + " WHERE conversation_id IS NOT NULL AND COALESCE(asst,0)=0"
-                            + " GROUP BY conversation_id ORDER BY conversation_id ASC", null);
+                            + " GROUP BY conversation_id", null);
             while (c.moveToNext()) {
                 ConversationSummary s = new ConversationSummary();
                 s.conversationId = c.getLong(0);
@@ -1625,7 +1651,18 @@ public class AppDatabase extends SQLiteOpenHelper {
         }
 
         fillSummaryPreviews(out, false);
+        sortNewestFirst(out);
         return out;
+    }
+
+    /** 最新在前，按**界面显示的那个时间**排（firstCreatedAt）。时间相同的用会话号兜底，保证顺序稳定。 */
+    private static void sortNewestFirst(List<ConversationSummary> out) {
+        java.util.Collections.sort(out, (a, b) -> {
+            if (a.firstCreatedAt != b.firstCreatedAt) {
+                return Long.compare(b.firstCreatedAt, a.firstCreatedAt);
+            }
+            return Long.compare(b.conversationId, a.conversationId);
+        });
     }
 
     /**
@@ -1754,13 +1791,16 @@ public class AppDatabase extends SQLiteOpenHelper {
 
     /** 主动式助手的会话列表（只含 asst=1 的对话），最新的在前。 */
     public List<ConversationSummary> listAssistantConversations() {
+        // 与 listConversations 同一口径：按最后一条消息的时间，**最新在前**
+        // （用户 2026-10-16 定）。旧写法 ORDER BY conversation_id DESC 只是
+        // "号大的在前"，助手号段内部碰巧跟时间同序，但一旦有会话跨号段就错。
         List<ConversationSummary> out = new ArrayList<>();
         Cursor c = null;
         try {
             c = getReadableDatabase().rawQuery(
                     "SELECT conversation_id, COUNT(*) FROM messages"
                             + " WHERE conversation_id IS NOT NULL AND asst=1"
-                            + " GROUP BY conversation_id ORDER BY conversation_id DESC", null);
+                            + " GROUP BY conversation_id", null);
             while (c.moveToNext()) {
                 ConversationSummary s = new ConversationSummary();
                 s.conversationId = c.getLong(0);
@@ -1772,6 +1812,7 @@ public class AppDatabase extends SQLiteOpenHelper {
             if (c != null) try { c.close(); } catch (Exception ignored) { }
         }
         fillSummaryPreviews(out, true);
+        sortNewestFirst(out);
         return out;
     }
 
@@ -2671,7 +2712,15 @@ public class AppDatabase extends SQLiteOpenHelper {
         return searchMessages(query, limit, false);
     }
 
-    /** includeAssistantSide=true 时连助手面板的会话一起搜（面板助手/定时激活查历史用，2026-10-13）。 */
+    /**
+     * 按侧搜聊天记录。
+     *
+     * <p>2026-10-17 用户定案：两侧的记录**互不相通**——
+     * 「他们不能相互缠着对方的意思对话……不然的话，混在一起就会搞混」。
+     * 所以 includeAssistantSide=true 表示"这是助手侧在搜"，**只搜 asst=1 那半边**；
+     * false 表示"主对话侧在搜"，只搜 asst=0 那半边。
+     * （改之前 true 是不加过滤、两侧全搜，助手会读到主对话的内容。）
+     */
     public List<MessageItem> searchMessages(String query, int limit, boolean includeAssistantSide) {
 
         List<MessageItem> result = new ArrayList<>();
@@ -2697,7 +2746,7 @@ public class AppDatabase extends SQLiteOpenHelper {
         for (String t : terms) {
             Cursor c = getReadableDatabase().query(
                     "messages", null,
-                    includeAssistantSide ? "content LIKE ?" : "content LIKE ? AND COALESCE(asst,0)=0",
+                    "content LIKE ? AND " + asstWhere(includeAssistantSide),
                     new String[]{"%" + t + "%"}, null, null, "id DESC", "30");
             while (c.moveToNext()) {
                 long id = c.getLong(c.getColumnIndexOrThrow("id"));
@@ -2762,6 +2811,12 @@ public class AppDatabase extends SQLiteOpenHelper {
     }
 
     public long insertKnowledgeChunk(String title, String chunk, String source, int chunkIndex, byte[] embedding) {
+        return insertKnowledgeChunk(title, chunk, source, chunkIndex, embedding, 0L);
+    }
+
+    /** sentAt = 用户发送这份文档的时间（0 = 没给，退回入库时间）。 */
+    public long insertKnowledgeChunk(String title, String chunk, String source, int chunkIndex,
+                                     byte[] embedding, long sentAt) {
         ContentValues values = new ContentValues();
         values.put("title", title);
         values.put("chunk", chunk);
@@ -2769,6 +2824,7 @@ public class AppDatabase extends SQLiteOpenHelper {
         values.put("chunk_index", chunkIndex);
         values.put("embedding", embedding);
         values.put("created_at", System.currentTimeMillis());
+        if (sentAt > 0) values.put("sent_at", sentAt);
         long id = getWritableDatabase().insert("knowledge", null, values);
         if (id > 0 && ftsReady()) {
             try {
@@ -2781,10 +2837,39 @@ public class AppDatabase extends SQLiteOpenHelper {
         return id;
     }
 
+    /**
+     * 回填某份文档的"发送时间"（2026-10-17）。
+     *
+     * <p>只动 sent_at 还是 0 的行；已经有值的不覆盖（同一份文档被助手回显过时，
+     * 早的那条会先命中，正好是用户真正发送的那次）。由 MainActivity 的后台一次性任务驱动。
+     */
+    public int setKnowledgeSentAtByTitle(String title, long sentAt) {
+        if (title == null || title.trim().isEmpty() || sentAt <= 0) return 0;
+        ContentValues cv = new ContentValues();
+        cv.put("sent_at", sentAt);
+        try {
+            return getWritableDatabase().update("knowledge", cv,
+                    "title = ? AND COALESCE(sent_at,0) = 0", new String[]{title});
+        } catch (Exception e) {
+            android.util.Log.w("VC_DOC", "回填文档发送时间失败: " + e.getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * 列名固定，**不 SELECT embedding**（2026-10-17 修）。
+     *
+     * <p>原来传 null = SELECT 所有列，会把 4096 字节的向量 blob 一起拖出来：
+     * 1000 行 ≈ 4.42 MB，超过 CursorWindow 的 2 MB 上限 → 抛异常 → 文档库页签显示"还没有文档"。
+     */
+    private static final String[] KNOWLEDGE_LIST_COLS = {
+            "id", "title", "chunk", "source", "chunk_index", "created_at"};
+
     public List<KnowledgeItem> listKnowledgeChunks(int limit) {
         List<KnowledgeItem> result = new ArrayList<>();
         Cursor cursor = getReadableDatabase().query(
-                "knowledge", null, null, null, null, null, "created_at DESC, id DESC", String.valueOf(limit));
+                "knowledge", KNOWLEDGE_LIST_COLS, null, null, null, null,
+                "created_at DESC, id DESC", String.valueOf(limit));
         while (cursor.moveToNext()) {
             result.add(cursorToKnowledgeItem(cursor));
         }
@@ -2792,10 +2877,53 @@ public class AppDatabase extends SQLiteOpenHelper {
         return result;
     }
 
+    /** 一份文档在列表里需要的元信息：标题 + 块数 + 最早入库时间。 */
+    public static class KnowledgeDocMeta {
+        public String title;
+        public int chunks;
+        public long createdAt;
+        /** 用户发送这份文档的时间；0 表示当时没记（显示时退回 createdAt）。 */
+        public long sentAt;
+    }
+
+    /**
+     * 知识库文档列表（按标题聚合，2026-10-17 新增）。
+     *
+     * <p>为什么不用 {@link #listKnowledgeChunks}：那个是"取最近 N 块"，块数一多（1077 块）
+     * 就会把最早的文档整份切掉（实测 9-25 那份 15 块 + 病情咨询组 62 块被截掉）。
+     * 列表只要"每份文档几块、什么时候入库"，交给 SQL 聚合，多少块都不会漏。
+     */
+    public List<KnowledgeDocMeta> listKnowledgeDocs() {
+        List<KnowledgeDocMeta> out = new ArrayList<>();
+        Cursor c = null;
+        try {
+            c = getReadableDatabase().rawQuery(
+                    "SELECT title, COUNT(*) AS n, MIN(created_at) AS t,"
+                            + " MIN(CASE WHEN COALESCE(sent_at,0) > 0 THEN sent_at ELSE created_at END) AS s"
+                            + " FROM knowledge GROUP BY title"
+                            + " ORDER BY s DESC, title ASC", null);
+            while (c.moveToNext()) {
+                KnowledgeDocMeta m = new KnowledgeDocMeta();
+                String t = c.getString(0);
+                m.title = (t == null || t.trim().isEmpty()) ? "未命名文档" : t;
+                m.chunks = c.getInt(1);
+                m.createdAt = c.getLong(2);
+                m.sentAt = c.getLong(3);
+                out.add(m);
+            }
+        } catch (Exception e) {
+            android.util.Log.w("VC_DOC", "列知识库文档失败: " + e.getMessage());
+        } finally {
+            if (c != null) { try { c.close(); } catch (Exception ignored) { } }
+        }
+        return out;
+    }
+
+    /** 同一张表同一类坑：导出全文用，同样不拖 embedding（2026-10-17 修）。 */
     public List<KnowledgeItem> listKnowledgeByTitle(String title) {
         List<KnowledgeItem> result = new ArrayList<>();
         Cursor cursor = getReadableDatabase().query(
-                "knowledge", null, "title = ?", new String[]{title == null ? "" : title},
+                "knowledge", KNOWLEDGE_LIST_COLS, "title = ?", new String[]{title == null ? "" : title},
                 null, null, "chunk_index ASC", null);
         while (cursor.moveToNext()) {
             result.add(cursorToKnowledgeItem(cursor));

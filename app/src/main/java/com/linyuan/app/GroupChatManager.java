@@ -3981,7 +3981,7 @@ public class GroupChatManager {
             AiClient.ChatResult res = AiClient.chatWithToolsStream(
                     st, sys, history, userText,
                     AiClient.buildAdminTools(), (name, args) -> this.handleAdminTool(roomId, name, args),
-                    500, listen, stopFlag);
+                    adminIters(st), listen, stopFlag);
 
             res = this.recheckPhantomClaim(roomId, res, st, sys, history, userText, listen, stopFlag);
 
@@ -4066,7 +4066,7 @@ public class GroupChatManager {
                  + "就直接说明清楚，不要重复提交。";
          AiClient.ChatResult res2 = AiClient.chatWithToolsStream(st, sys, h2, fix,
                  AiClient.buildAdminTools(), (name, args) -> this.handleAdminTool(roomId, name, args),
-                 500, listen, stopFlag);
+                 adminIters(st), listen, stopFlag);
          if (res2 != null && res2.content != null && !res2.content.trim().isEmpty()) {
             res2.content = answer + "\n\n" + res2.content.trim();
             res2.toolLog = (res.toolLog == null ? "" : res.toolLog)
@@ -5147,7 +5147,7 @@ public class GroupChatManager {
       AiClient.ChatResult res = AiClient.chatWithToolsStream(
               st, sys, new ArrayList<AppDatabase.MessageItem>(), task.toString(),
               AiClient.buildAdminTools(), (name, args) -> this.handleAdminTool(roomId, name, args),
-              500, new AiClient.StreamListener() {
+              adminIters(st), new AiClient.StreamListener() {
                  public void onReasoningDelta(String delta) { thinkBuf.append(delta); }
                  public void onContentDelta(String delta) { streamed[0] += delta; }
                  public void onToolStart(String name, String argSummary) {
@@ -5212,6 +5212,13 @@ public class GroupChatManager {
       st.thinkLevel = cfg.thinkLevel;
       if (cfg.thinkLevel < 0 && this.settings.thinkLevel >= 0) st.thinkLevel = this.settings.thinkLevel;
       return st;
+   }
+
+   /** 管理员那几轮的轮数：跟全局同一个值（2026-10-17：原来 5 处硬编码 500）。 */
+   private int adminIters(AppSettings st) {
+      if (st != null && st.maxToolIterations > 0) return st.maxToolIterations;
+      return this.settings != null && this.settings.maxToolIterations > 0
+              ? this.settings.maxToolIterations : 500;
    }
 
    private int adminContextLimit(long roomId) {
@@ -5298,7 +5305,7 @@ public class GroupChatManager {
          AiClient.ChatResult res = AiClient.chatWithToolsStream(
                  st, sys.toString(), new ArrayList<AppDatabase.MessageItem>(), usr.toString(),
                  AiClient.buildAdminTools(), (name, args) -> this.handleAdminTool(roomId, name, args),
-                 500, null, (java.util.concurrent.atomic.AtomicBoolean) null);
+                 adminIters(st), null, (java.util.concurrent.atomic.AtomicBoolean) null);
          String answer = res != null && res.content != null && !res.content.trim().isEmpty()
                  ? res.content.trim() : "（管理员没有返回内容）";
          this.db.insertGmAdminMessage(roomId, "assistant",
@@ -5400,7 +5407,7 @@ public class GroupChatManager {
          AiClient.ChatResult res = AiClient.chatWithToolsStream(
                  st, base, history, task.toString(),
                  AiClient.buildAdminTools(), (name, args) -> this.handleAdminTool(roomId, name, args),
-                 500, null, (java.util.concurrent.atomic.AtomicBoolean) null);
+                 adminIters(st), null, (java.util.concurrent.atomic.AtomicBoolean) null);
 
          String answer = res != null && res.content != null && !res.content.trim().isEmpty()
                  ? res.content.trim() : "";

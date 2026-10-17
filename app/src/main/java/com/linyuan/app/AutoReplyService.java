@@ -119,7 +119,8 @@ public class AutoReplyService extends Service {
                     + "Do your job: go into 微信, see which messages need a reply, reply to the ones that do, and leave the rest alone. "
                     + "When done, briefly state in one sentence what you did this time.";
 
-            int maxIter = Math.min(20, Math.max(12, settings.maxToolIterations));
+            // 轮数跟全局一个值（2026-10-17：原来这里夹在 12~20，用户设 500 也不作数）
+            int maxIter = settings.maxToolIterations > 0 ? settings.maxToolIterations : 500;
 
             applyRuleModel(settings);
             AiClient.ChatResult result = AiClient.chatWithToolsStream(
@@ -131,9 +132,11 @@ public class AutoReplyService extends Service {
 
             try {
                 long cid = 0;
+                // 列表现在是"最新在前"，最近的会话是第 0 个（用户 2026-10-16 定）。
+                // 旧写法取 size()-1，排序一改就会把自动回复写进最旧的那个会话。
                 List<AppDatabase.ConversationSummary> convs = db.listConversations();
                 if (convs != null && !convs.isEmpty()) {
-                    cid = convs.get(convs.size() - 1).conversationId;
+                    cid = convs.get(0).conversationId;
                 }
                 if (cid > 0) {
                     db.insertMessage("assistant",

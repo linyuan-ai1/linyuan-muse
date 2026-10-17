@@ -50,10 +50,10 @@ public class SystemIslandService {
                 if (attach() && island != null && (stickyWanted || desktopPersistentWanted)) {
 
                     island.setSticky(true);
-                    if (desktopPersistentWanted && doubleTapAction != null) {
+                    if (desktopPersistentWanted) {
                         island.setDesktopPersistent(true);
-                        island.setDoubleTapAction(doubleTapAction);
                     }
+                    applyTapActions();
                     setTouchable(desktopPersistentWanted);
                     island.refreshNow();
                 }
@@ -193,10 +193,10 @@ public class SystemIslandService {
                     if (ok && island != null) {
 
                         island.setSticky(stickyWanted || desktopPersistentWanted);
-                        if (desktopPersistentWanted && doubleTapAction != null) {
+                        if (desktopPersistentWanted) {
                             island.setDesktopPersistent(true);
-                            island.setDoubleTapAction(doubleTapAction);
                         }
+                        applyTapActions();
                         island.refreshNow();
                     }
                     return;
@@ -260,6 +260,16 @@ public class SystemIslandService {
     private volatile boolean desktopPersistentWanted = false;
     private volatile Runnable doubleTapAction = null;
 
+    /** 连点三下的动作（只暂停屏幕操作员）。存字段：重挂会换掉 View，必须能恢复。 */
+    private volatile Runnable tripleTapAction = null;
+
+    /** 双击/三连点动作统一从这里下发：重挂后的每条路径都调它，别各写各的。 */
+    private void applyTapActions() {
+        if (island == null) return;
+        island.setDoubleTapAction(doubleTapAction);
+        island.setTripleTapAction(tripleTapAction);
+    }
+
     public boolean isDesktopPersistent() {
         return desktopPersistentWanted;
     }
@@ -269,18 +279,19 @@ public class SystemIslandService {
             try {
                 desktopPersistentWanted = on;
                 doubleTapAction = onDoubleTap;
+                tripleTapAction = on ? (SystemIslandService.this::pauseScreenOperator) : null;
                 if (on) {
                     if (!attach()) return;
                     if (island == null) return;
 
                     island.setSticky(true);
                     island.setDesktopPersistent(true);
-                    island.setDoubleTapAction(onDoubleTap);
+                    applyTapActions();
                     setTouchable(true);
                     island.refreshNow();
                 } else {
                     if (island != null) {
-                        island.setDoubleTapAction(null);
+                        applyTapActions();
                         island.setDesktopPersistent(false);
 
                         if (stickyWanted) {
@@ -300,6 +311,31 @@ public class SystemIslandService {
         else ui.post(job);
     }
 
+    /**
+     * 连点三下 = 只暂停屏幕操作员（用户 2026-10-16 定）。
+     *
+     * <p>屏幕操作员抢着用屏幕和输入的时候，用户来不及跟主助手说话去停它，所以给这个手势。
+     * 只停带屏幕工具的活儿（accessibility / tap_script），别的子智能体一律不动。
+     */
+    private void pauseScreenOperator() {
+        int n = 0;
+        try { n = SubAgentRunner.stopJobs(null, true); } catch (Throwable ignored) { }
+        String msg = n > 0 ? "已暂停屏幕操作员" : "现在没有屏幕操作员在跑";
+        android.util.Log.i("VC_ISLAND", "三连点：" + msg);
+        // 岛上直接显示这句话：走"助手说话"那条已经在用的渲染路径（后台 toast 会被系统吞掉）
+        try {
+            final BrowserIslandView isl = island;
+            if (isl != null) {
+                isl.pushSpoken(msg, msg.length());
+                for (int i = 1; i <= 4; i++) ui.postDelayed(isl::keepSpokenAlive, i * 500L);
+                ui.postDelayed(isl::clearSpoken, 2500L);
+            }
+        } catch (Throwable ignored) { }
+        try {
+            android.widget.Toast.makeText(appCtx, msg, android.widget.Toast.LENGTH_SHORT).show();
+        } catch (Throwable ignored) { }
+    }
+
     private static final long WATCHDOG_MS = 30000L;
     private boolean watchdogOn = false;
 
@@ -316,11 +352,10 @@ public class SystemIslandService {
                     if (island != null) detach();
                     if (attach() && island != null && stickyWanted) {
                         island.setSticky(true);
-
-                        if (desktopPersistentWanted && doubleTapAction != null) {
+                        if (desktopPersistentWanted) {
                             island.setDesktopPersistent(true);
-                            island.setDoubleTapAction(doubleTapAction);
                         }
+                        applyTapActions();
                         setTouchable(desktopPersistentWanted);
                     }
                 }
@@ -413,10 +448,10 @@ public class SystemIslandService {
                 if (island == null) return;
 
                 island.setSticky(stickyWanted || desktopPersistentWanted);
-                if (desktopPersistentWanted && doubleTapAction != null) {
+                if (desktopPersistentWanted) {
                     island.setDesktopPersistent(true);
-                    island.setDoubleTapAction(doubleTapAction);
                 }
+                applyTapActions();
                 island.refreshNow();
                 if (lp != null) {
                     if (touchableMode) lp.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;

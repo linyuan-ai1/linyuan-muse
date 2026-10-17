@@ -1475,9 +1475,9 @@ public class AssistantPanel {
                 AppSettings s = act.buildAssistantSettings(model, baseUrl, apiKey, thinkLevel);
                 String sys = act.buildAssistantPrompt(promptText, rolePromptOf(activeAgent));
                 sys = sys + act.buildAssistantSubAgentBlock(activeAgent);
-                int maxIter = Math.max(4, Math.min(20,
-                        act.getSharedPreferences("voice_companion", Context.MODE_PRIVATE)
-                                .getInt("maxToolIterations", 4)));
+                // 轮数只读设置里那一个值（2026-10-17 改：原来这里额外夹在 4~20，
+                // 用户在设置里填 500 也没用）。上限由设置页那个输入框管。
+                int maxIter = SubAgentRunner.maxIters(act);
                 AssistantToolHandler handler = new AssistantToolHandler(act, activeAgent);
                 JSONArray asstTools = SubAgentRunner.buildTools(act, mainGrantedTools());
                 JSONArray subTools = SubAgentRunner.buildTool(
@@ -1686,6 +1686,8 @@ public class AssistantPanel {
             sub = "已关闭 · 点一下开";
         } else if (times.isEmpty() && selfN == 0) {
             sub = "已开启 · 还没设时间";
+        } else if (times.isEmpty()) {
+            sub = "已开启 · 只有它自己排的 " + selfN + " 个";
         } else {
             StringBuilder s = new StringBuilder();
             if (!times.isEmpty()) {
@@ -2117,10 +2119,6 @@ public class AssistantPanel {
         save.setLayoutParams(slp3);
         save.setOnClickListener(v -> {
             boolean want = sw.isChecked();
-            if (want && times.isEmpty()) {
-                act.toast("开着就得至少有一个时间点，先加一个");
-                return;
-            }
             AssistTimerStore.setEnabled(act, want);
             AssistTimerStore.setTimes(act, times);
             AssistTimerStore.setDays(act, days[0]);
@@ -2316,6 +2314,22 @@ public class AssistantPanel {
 
     List<String> mainGrantedTools() {
         String raw = prefs().getString("mainTools", "");
+        // 定时任务三件套 2026-10-17 从主助手剥离：老 prefs 里存着也要排掉，不然它还拿得到
+        {
+            List<String> cleaned = new ArrayList<>();
+            for (String t : SubAgentStore.subList(raw)) {
+                if (!SubAgentRunner.isMainChatOnly(t)) cleaned.add(t);
+            }
+            if (cleaned.size() != SubAgentStore.subList(raw).size()) {
+                StringBuilder sb = new StringBuilder();
+                for (String t : cleaned) {
+                    if (sb.length() > 0) sb.append(",");
+                    sb.append(t);
+                }
+                prefs().edit().putString("mainTools", sb.toString()).apply();
+                raw = sb.toString();
+            }
+        }
         List<String> l = SubAgentStore.subList(raw);
         if (l.isEmpty()) {
             l.addAll(defaultGrantedTools());
@@ -3032,6 +3046,57 @@ public class AssistantPanel {
         toolRow.addView(modelBtn, mlp);
         pageTalk.addView(toolRow, toolLp);
 
+        // 工具轮数（2026-10-17 加）：以前这个值只在设置页深处，助手面板还额外夹在 20，
+        // 用户「8 轮哪来的」的疑问就是这么来的。放到这里，跟模型/用量并排。
+        final LinearLayout iterRow = new LinearLayout(act);
+        iterRow.setOrientation(LinearLayout.HORIZONTAL);
+        iterRow.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams iterLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        iterLp.setMargins(0, act.dp(6), 0, 0);
+
+        TextView iterLabel = new TextView(act);
+        iterLabel.setText("工具轮数");
+        iterLabel.setTextColor(act.col(R.color.muted));
+        iterLabel.setTextSize(12.0F);
+        iterRow.addView(iterLabel);
+
+        final android.widget.EditText iterEdit = new android.widget.EditText(act);
+        iterEdit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        iterEdit.setTextSize(12.5F);
+        iterEdit.setSingleLine(true);
+        iterEdit.setBackgroundResource(R.drawable.bg_edit);
+        iterEdit.setPadding(act.dp(8), act.dp(4), act.dp(8), act.dp(4));
+        iterEdit.setText(String.valueOf(SubAgentRunner.maxIters(act)));
+        LinearLayout.LayoutParams ielp = new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        ielp.setMarginStart(act.dp(8));
+        iterRow.addView(iterEdit, ielp);
+
+        TextView iterSave = mkSheetBtn("保存");
+        iterSave.setTextColor(act.col(R.color.accent));
+        iterSave.setBackgroundResource(R.drawable.btn_ghost);
+        LinearLayout.LayoutParams islp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        islp.setMarginStart(act.dp(6));
+        iterSave.setOnClickListener(v -> {
+            int val;
+            try {
+                val = Integer.parseInt(iterEdit.getText().toString().trim());
+            } catch (Exception e) {
+                act.toast("填个数字");
+                return;
+            }
+            if (val < 1) val = 1;
+            if (val > 9999) val = 9999;
+            act.getSharedPreferences("voice_companion", Context.MODE_PRIVATE)
+                    .edit().putInt("maxToolIterations", val).apply();
+            iterEdit.setText(String.valueOf(val));
+            act.toast("工具轮数已设为 " + val + "（主对话、助手、定时激活、子智能体都按这个来）");
+        });
+        iterRow.addView(iterSave, islp);
+        pageTalk.addView(iterRow, iterLp);
+
         // ---- 第二页：智能体 / 角色提示词等（原「设置」弹窗内容）----
         final LinearLayout grid = new LinearLayout(act);
         grid.setOrientation(LinearLayout.VERTICAL);
@@ -3708,6 +3773,7 @@ public class AssistantPanel {
         String lastGroup = null;
         for (final String[] row : SubAgentRunner.TOOL_CATALOG) {
             if (forSubAgent && SubAgentRunner.asstOnly(row[0])) continue;
+            if (!forSubAgent && SubAgentRunner.isMainChatOnly(row[0])) continue;
             shown.add(row[0]);
             if (!row[2].equals(lastGroup)) {
                 lastGroup = row[2];

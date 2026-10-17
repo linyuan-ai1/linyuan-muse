@@ -85,6 +85,42 @@ public class MainActivity extends Activity {
 
     private static java.lang.ref.WeakReference<MainActivity> sCurrent;
 
+    /** 后台（定时任务/定时激活）用：还活着的主助手实例，没有就 null。 */
+    static MainActivity current() {
+        MainActivity a = sCurrent == null ? null : sCurrent.get();
+        if (a == null || a.isFinishing() || a.isDestroyed()) return null;
+        return a;
+    }
+
+    /**
+     * 后台要把主助手拉起来（用户定案：定时任务/定时激活必须用完整版助手，不做残缺版兜底）。
+     *
+     * <p>本 App 有 SYSTEM_ALERT_WINDOW（悬浮球/灵动岛），所以从后台 startActivity 是允许的。
+     * 拉起来最多等 ~12 秒（onCreate 里会写 sCurrent），起不来返回 null 由调用方如实报失败。
+     */
+    static MainActivity wake(Context ctx) {
+        MainActivity a = current();
+        if (a != null) return a;
+        try {
+            android.content.Intent i = new android.content.Intent(ctx, MainActivity.class);
+            i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                    | android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            ctx.startActivity(i);
+        } catch (Throwable t) {
+            android.util.Log.w("VC_TASK", "拉起主助手失败: " + t.getMessage());
+            return null;
+        }
+        for (int i = 0; i < 24; i++) {
+            try { Thread.sleep(500L); } catch (InterruptedException ie) { return null; }
+            a = current();
+            if (a != null) {
+                android.util.Log.i("VC_TASK", "主助手已拉起（等了 " + ((i + 1) * 500) + "ms）");
+                return a;
+            }
+        }
+        return null;
+    }
+
     static boolean toggleCallFromOutside() {
         MainActivity a = sCurrent == null ? null : sCurrent.get();
         if (a == null || a.isFinishing() || a.isDestroyed()) return false;
@@ -456,6 +492,7 @@ public class MainActivity extends Activity {
         bumpSearchPerMinuteOnce();
         applySearchLimitSettings();
         repairDocKnowledgeOnce();
+        backfillKnowledgeSentAtOnce();   // 文档卡片要显示「发送时间」，回填老文档
         maybeSleepConsolidate();
         repairMisarchivedOnce();
         AssistantMemory.migrateLegacy(this, db);
@@ -2047,9 +2084,11 @@ public class MainActivity extends Activity {
     }
 
     private void jumpToNewestConversation() {
+        // 列表现在"最新在前"，所以最近的那个是第 0 个（用户 2026-10-16 定）。
+        // 旧写法取 size()-1 —— 那是按会话号升序时"最后一个=最新"的老假设，排序一改就会跳到最旧的那个。
         List<AppDatabase.ConversationSummary> convs = db.listConversations();
         if (convs.isEmpty()) { setCurrentConversation(0); return; }
-        setCurrentConversation(convs.get(convs.size() - 1).conversationId);
+        setCurrentConversation(convs.get(0).conversationId);
     }
 
     private void repairSplitSessionOnce() {
@@ -2824,6 +2863,9 @@ public class MainActivity extends Activity {
                         String body = r.text == null ? "" : r.text;
                         if (body.length() > 300000) body = body.substring(0, 300000) + "\n（文档过长已截断）";
                         docPart.append("\n\n【文档：").append(a.name).append("】\n").append(body);
+                        // 写知识库（2026-10-17 修）：单文档那条路一直在写，这条批量路漏了——
+                        // 结果"发出去的文档"只在当轮上下文里活一次，文档库「我发的文档」里看不到。
+                        if (r.error == null) saveDocToKnowledge(a.name, body);
                     } catch (Throwable t) {
                         android.util.Log.w("VC_ATTACH", "文档读取失败: " + t);
                     }
@@ -2913,7 +2955,7 @@ public class MainActivity extends Activity {
 
                         result = AiClient.chatWithToolsStream(settings, systemPrompt, recent, fullUser,
                                 buildAllTools(), this::handleAllTool,
-                                settings.maxToolIterations > 0 ? settings.maxToolIterations : 4,
+                                settings.maxToolIterations > 0 ? settings.maxToolIterations : 500,
                                 new AiClient.StreamListener() {
                                     @Override public void onReasoningDelta(String delta) { appendLiveReasoning(delta); }
                                     @Override public void onContentDelta(String delta) { appendLiveContent(delta); }
@@ -2928,7 +2970,7 @@ public class MainActivity extends Activity {
                         android.util.Log.w("VC_STREAM", "doc stream failed, fallback: " + se.getMessage());
                         result = AiClient.chatWithTools(settings, systemPrompt, recent, fullUser,
                                 buildAllTools(), this::handleAllTool,
-                                settings.maxToolIterations > 0 ? settings.maxToolIterations : 4);
+                                settings.maxToolIterations > 0 ? settings.maxToolIterations : 500);
                     }
                 } else {
                     result = AiClient.chat(settings, modelText, loadMemoryContents(userText), recent);
@@ -3368,6 +3410,11 @@ public class MainActivity extends Activity {
     }
 
     private void saveDocToKnowledge(String title, String fullText) {
+        saveDocToKnowledge(title, fullText, System.currentTimeMillis());
+    }
+
+    /** sentAt = 用户发送这份文档的时间（存进文档自己那列，跟对话解耦）。 */
+    private void saveDocToKnowledge(String title, String fullText, long sentAt) {
         try {
             if (title == null || title.trim().isEmpty() || fullText == null || fullText.trim().isEmpty()) return;
             java.util.List<DocExtractor.Chunk> chunks = DocExtractor.chunkText(fullText);
@@ -3385,7 +3432,7 @@ public class MainActivity extends Activity {
                         android.util.Log.w("VC_EMB", "知识库分片算向量失败（该片将无向量，仅关键词可搜）: " + e.getMessage());
                     }
                 }
-                db.insertKnowledgeChunk(title, c.text, title, c.index, emb);
+                db.insertKnowledgeChunk(title, c.text, title, c.index, emb, sentAt);
                 saved++;
             }
             android.util.Log.i("VC_DOC", "文档已写入知识库: " + title + " (" + saved + " 块)");
@@ -3416,9 +3463,14 @@ public class MainActivity extends Activity {
                     if (nl < 0) continue;
                     String title = after.substring(0, nl).trim();
                     String body = after.substring(nl + 1).trim();
+                    // 批量附件路存下来的正文外面包了一层"【文档：xxx】"（2026-10-17 修）：
+                    // 补录时剥掉，否则那行标记会被当成正文开头写进知识库。
+                    body = stripDocWrapper(body);
                     body = body.replace("（文档过长已截断）", "").trim();
                     if (title.isEmpty() || body.isEmpty()) continue;
-                    saveDocToKnowledgeSilently(title, body);
+                    // 补录用"那条消息当初的时间"当发送时间，这样老文档的卡片显示的是真实发送时间
+                    //（而不是补录时的今天）。补完之后时间已存在 knowledge 表里，不再依赖消息。
+                    saveDocToKnowledgeSilently(title, body, m.createdAt);
                     n++;
                 }
                 sp.edit().putBoolean(FLAG, true).apply();
@@ -3436,7 +3488,69 @@ public class MainActivity extends Activity {
         });
     }
 
+    /**
+     * 一次性回填：把 knowledge 里每份文档的 sent_at 设成「用户当初发它那条消息的时间」
+     *（2026-10-17）。
+     *
+     * <p>为什么不写在 AppDatabase.onUpgrade 里：那里是主线程、又落在广播超时窗口内，
+     * 而回填需要把 knowledge 每行跟 messages 做一次 LIKE 关联，1077 行 × 3.5 MB 正文
+     * 直接把 MY_PACKAGE_REPLACED 拖成 ANR、事务回滚（详见 AppDatabase.onUpgrade 注释）。
+     *
+     * <p>这里只有 5 条 @@DOC 消息、每份文档一条 UPDATE，走 idx_knowledge_title，毫秒级。
+     * 回填完之后时间就存在 knowledge 自己那一列，删对话也不会把时间弄丢。
+     */
+    private void backfillKnowledgeSentAtOnce() {
+        final String FLAG = "doc_sentat_backfilled_v1";
+        android.content.SharedPreferences sp = getSharedPreferences(PREFS, MODE_PRIVATE);
+        if (sp.getBoolean(FLAG, false)) return;
+        bgExecute(() -> {
+            int n = 0;
+            try {
+                List<AppDatabase.MessageItem> docs = db.listMessagesWithDocMarker(50);
+                for (AppDatabase.MessageItem m : docs) {
+                    String c = m.content;
+                    int di = c.indexOf("@@DOC:");
+                    if (di < 0) continue;
+                    String after = c.substring(di + "@@DOC:".length());
+                    int nl = after.indexOf("\n");
+                    if (nl < 0) continue;
+                    String title = after.substring(0, nl).trim();
+                    if (title.isEmpty()) continue;
+                    n += db.setKnowledgeSentAtByTitle(title, m.createdAt);
+                }
+                sp.edit().putBoolean(FLAG, true).apply();
+                android.util.Log.i("VC_DOC", "回填文档发送时间完成，改了 " + n + " 行");
+                if (n > 0) runOnUiThread(this::loadKnowledgeUi);
+            } catch (Exception e) {
+                android.util.Log.w("VC_DOC", "回填文档发送时间失败: " + e.getMessage());
+            }
+        });
+    }
+
+    /** 剥掉批量附件路多出来的"【文档：xxx】"包裹（一份文档一层，可能有多份连着）。 */
+    private static String stripDocWrapper(String body) {
+        if (body == null) return "";
+        String b = body.trim();
+        StringBuilder out = new StringBuilder();
+        int guard = 0;
+        while (guard++ < 50) {
+            int i = b.indexOf("【文档：");
+            if (i < 0) break;
+            int j = b.indexOf("】", i);
+            if (j < 0) break;
+            String before = b.substring(0, i).trim();
+            if (!before.isEmpty()) out.append(before).append("\n\n");
+            b = b.substring(j + 1).trim();
+        }
+        if (b.isEmpty()) return out.toString().trim();
+        return (out.length() == 0 ? b : out.append(b).toString()).trim();
+    }
+
     private void saveDocToKnowledgeSilently(String title, String fullText) {
+        saveDocToKnowledgeSilently(title, fullText, System.currentTimeMillis());
+    }
+
+    private void saveDocToKnowledgeSilently(String title, String fullText, long sentAt) {
         try {
             java.util.List<DocExtractor.Chunk> chunks = DocExtractor.chunkText(fullText);
             if (chunks.isEmpty()) return;
@@ -3452,7 +3566,7 @@ public class MainActivity extends Activity {
                         android.util.Log.w("VC_EMB", "知识库分片算向量失败（该片将无向量，仅关键词可搜）: " + e.getMessage());
                     }
                 }
-                db.insertKnowledgeChunk(title, c.text, title, c.index, emb);
+                db.insertKnowledgeChunk(title, c.text, title, c.index, emb, sentAt);
             }
         } catch (Exception e) {
             android.util.Log.w("VC_DOC", "silent 写入失败: " + e.getMessage());
@@ -3847,7 +3961,7 @@ public class MainActivity extends Activity {
                     try {
                         result = AiClient.chatWithTools(settings, systemPrompt, buildContextByTokenBudget(userMsgId), userWithVision,
                                 buildAllTools(), this::handleAllTool,
-                                settings.maxToolIterations > 0 ? settings.maxToolIterations : 4,
+                                settings.maxToolIterations > 0 ? settings.maxToolIterations : 500,
                                 imageForMain);
                         if (needsMemoryExtraction(userContent, result.content)) {
                             saveExtractedMemories(userContent, result.content);
@@ -4317,7 +4431,7 @@ public class MainActivity extends Activity {
 
                         result = AiClient.chatWithToolsStream(settings, systemPrompt, recent, modelText,
                                 buildAllTools(), this::handleAllTool,
-                                settings.maxToolIterations > 0 ? settings.maxToolIterations : 4,
+                                settings.maxToolIterations > 0 ? settings.maxToolIterations : 500,
                                 new AiClient.StreamListener() {
                                     @Override public void onReasoningDelta(String delta) { appendLiveReasoning(delta); }
                                     @Override public void onContentDelta(String delta) { appendLiveContent(delta); }
@@ -4354,7 +4468,7 @@ public class MainActivity extends Activity {
                             try {
                                 result = AiClient.chatWithToolsStream(settings, systemPrompt, recent, modelText,
                                         buildAllTools(), this::handleAllTool,
-                                        settings.maxToolIterations > 0 ? settings.maxToolIterations : 4,
+                                        settings.maxToolIterations > 0 ? settings.maxToolIterations : 500,
                                         new AiClient.StreamListener() {
                                             @Override public void onReasoningDelta(String delta) { appendLiveReasoning(delta); }
                                             @Override public void onContentDelta(String delta) { appendLiveContent(delta); }
@@ -4371,7 +4485,7 @@ public class MainActivity extends Activity {
                                 android.util.Log.w("VC_STREAM", "重试仍失败，降级非流式: " + se2.getMessage());
                                 result = AiClient.chatWithTools(settings, systemPrompt, recent, modelText,
                                         buildAllTools(), this::handleAllTool,
-                                        settings.maxToolIterations > 0 ? settings.maxToolIterations : 4);
+                                        settings.maxToolIterations > 0 ? settings.maxToolIterations : 500);
                                 if (needsMemoryExtraction(userText, result.content)) {
                                     saveExtractedMemories(userText, result.content);
                                 }
@@ -4381,7 +4495,7 @@ public class MainActivity extends Activity {
                             setLiveStatus("⏳ 流式不可用，改用完整回复模式（要等生成完才显示）…");
                             result = AiClient.chatWithTools(settings, systemPrompt, recent, modelText,
                                     buildAllTools(), this::handleAllTool,
-                                    settings.maxToolIterations > 0 ? settings.maxToolIterations : 4);
+                                    settings.maxToolIterations > 0 ? settings.maxToolIterations : 500);
                             if (needsMemoryExtraction(userText, result.content)) {
                                 saveExtractedMemories(userText, result.content);
                             }
@@ -7135,9 +7249,14 @@ public class MainActivity extends Activity {
 
             JSONObject oa = new JSONObject();
             oa.put("name", "open_app");
-            oa.put("description", "Open an installed app on the phone. Call it when the user asks to open 微信 (WeChat) / 抖音 (Douyin) / 支付宝 (Alipay) / Settings / Camera / the browser, etc.");
+            oa.put("description", "Open an installed app on the phone. Call it when the user asks to open 微信 (WeChat) / 抖音 (Douyin) / 支付宝 (Alipay) / Settings / Camera / the browser, etc. "
+                    + "If several installed apps share a name fragment (e.g. 拼多多 vs 拼多多商家版, 淘宝 vs 阿里拍卖, QQ vs QQ浏览器), "
+                    + "pass the app's COMPLETE display name, or its package name - a partial name may open the wrong one. "
+                    + "When unsure which app the user means, call list_apps first and use the exact name or package you find there.");
             JSONObject oaProps = new JSONObject();
-            oaProps.put("app", new JSONObject().put("type", "string").put("description", "The app's Chinese name or package name, e.g. 微信, 抖音, 支付宝, 相机, 设置"));
+            oaProps.put("app", new JSONObject().put("type", "string").put("description",
+                    "The app's COMPLETE display name or its package name, e.g. 微信, 拼多多 (not just 拼多), com.tencent.mm. "
+                            + "A partial name can match a different app (拼多多商家版 also contains 拼多多)."));
             oa.put("parameters", new JSONObject().put("type", "object").put("properties", oaProps)
                     .put("required", new JSONArray().put("app")));
             tools.put(new JSONObject().put("type", "function").put("function", oa));
@@ -8799,18 +8918,26 @@ public class MainActivity extends Activity {
                     return toolOk("已打开系统闹钟，设置为 " + hour + ":" + String.format(Locale.US, "%02d", minute) + "（请在闹钟界面点保存）");
                 }
                 case "list_apps": {
+                    // 全量返回（2026-10-17 改）：原来只给前 30 个，模型看不到"拼多多"
+                    // 和"拼多多商家版"同时存在，只能靠关键词猜，于是老开错那个。
+                    // 应用名就是几个字，全量也就几 KB —— 让它按"名字 + 包名"精确指定。
                     JSONArray apps = new JSONArray();
                     List<android.content.pm.ApplicationInfo> infos =
                             getPackageManager().getInstalledApplications(0);
-                    int n = 0;
+                    int total = 0;
                     for (android.content.pm.ApplicationInfo info : infos) {
-                        if ((info.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0) continue;
                         String label = info.loadLabel(getPackageManager()).toString();
                         if (label == null || label.trim().isEmpty()) continue;
-                        apps.put(new JSONObject().put("name", label).put("package", info.packageName));
-                        if (++n >= 30) break;
+                        boolean sys = (info.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0;
+                        JSONObject o = new JSONObject().put("name", label.trim())
+                                .put("package", info.packageName);
+                        if (sys) o.put("system", true);
+                        apps.put(o);
+                        total++;
                     }
-                    return toolOk("已安装应用（前 30 个）：\n" + apps.toString());
+                    return toolOk("已安装应用（共 " + total + " 个，name=显示名 / package=包名，"
+                            + "system=true 是系统应用）。要打开哪个就直接用 open_app 传它完整的 name 或 package：\n"
+                            + apps.toString());
                 }
                 case "read_sms": {
                     if (checkSelfPermission(Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
@@ -8981,7 +9108,14 @@ public class MainActivity extends Activity {
 
     private String openAppByName(String app) throws Exception {
         final String pkg = resolveAppPackage(app);
-        if (pkg == null) return toolErr("没找到应用「" + app + "」，可以直接给包名再试");
+        if (pkg == null) {
+            if (lastAmbiguousApps != null) {
+                // 有多个都叫这个名（拼多多 / 拼多多商家版）：不猜，让模型报完整名或包名
+                return toolErr("「" + app + "」匹配到多个应用：" + lastAmbiguousApps
+                        + "。请用**完整名字**或**包名**再调一次 open_app，别用简称。");
+            }
+            return toolErr("没找到应用「" + app + "」，可以先调 list_apps 看完整名字，或直接给包名");
+        }
         runOnUiThread(() -> {
             try {
                 Intent launch = getPackageManager().getLaunchIntentForPackage(pkg);
@@ -9022,7 +9156,25 @@ public class MainActivity extends Activity {
             {"日历", "com.android.calendar"},
     };
 
+    /** 匹配不唯一时的说明（给模型看，让它改用完整名或包名）。null = 能唯一定位。 */
+    private String lastAmbiguousApps = null;
+
+    /**
+     * 把用户/AI 说的应用名解析成包名。
+     *
+     * <p>2026-10-17 重写。旧版只有一句 {@code label.contains(app)}，谁先返回用谁 ——
+     * 装了两个都含「拼多多」的 App（拼多多 / 拼多多商家版）时就会开错那个，
+     * 而且没有任何提示。现在的顺序：
+     * <ol>
+     *   <li>包名（含点号）→ 直接用；</li>
+     *   <li>COMMON_APPS 精确命中 → 直接用（老路径保留）；</li>
+     *   <li>显示名**完全相等** → 唯一命中就用它（这是最准的一档）；</li>
+     *   <li>显示名包含 → 收集**全部**候选：如果只有一个，用它；多个则返回 null
+     *       并把候选清单放进 {@link #lastAmbiguousApps}，由调用方如实告诉模型。</li>
+     * </ol>
+     */
     private String resolveAppPackage(String app) {
+        lastAmbiguousApps = null;
         String lower = app.toLowerCase().trim();
         for (String[] pair : COMMON_APPS) {
             if (pair[0].equalsIgnoreCase(lower)) {
@@ -9030,7 +9182,7 @@ public class MainActivity extends Activity {
             }
         }
 
-        if (lower.matches("[a-z0-9.]+") && lower.contains(".")) {
+        if (lower.matches("[a-z0-9._]+") && lower.contains(".")) {
             return lower;
         }
 
@@ -9039,11 +9191,34 @@ public class MainActivity extends Activity {
                     .addCategory(Intent.CATEGORY_LAUNCHER);
             java.util.List<android.content.pm.ResolveInfo> infos =
                     getPackageManager().queryIntentActivities(mainIntent, 0);
+
+            // 第一档：显示名完全相等（trim + 忽略大小写）
+            for (android.content.pm.ResolveInfo info : infos) {
+                String label = info.loadLabel(getPackageManager()).toString();
+                if (label != null && label.trim().equalsIgnoreCase(app.trim())) {
+                    return info.activityInfo.packageName;
+                }
+            }
+
+            // 第二档：显示名包含 —— 收全部候选，不猜
+            java.util.LinkedHashMap<String, String> hits = new java.util.LinkedHashMap<>();
             for (android.content.pm.ResolveInfo info : infos) {
                 String label = info.loadLabel(getPackageManager()).toString();
                 if (label != null && label.contains(app)) {
-                    return info.activityInfo.packageName;
+                    hits.put(info.activityInfo.packageName, label.trim());
                 }
+            }
+            if (hits.size() == 1) {
+                return hits.keySet().iterator().next();
+            }
+            if (hits.size() > 1) {
+                StringBuilder sb = new StringBuilder();
+                for (java.util.Map.Entry<String, String> e : hits.entrySet()) {
+                    if (sb.length() > 0) sb.append("、");
+                    sb.append("「").append(e.getValue()).append("」(").append(e.getKey()).append(")");
+                }
+                lastAmbiguousApps = sb.toString();
+                return null;
             }
         } catch (Exception ignored) {}
         return null;
@@ -9677,7 +9852,7 @@ public class MainActivity extends Activity {
             }
 
             if (ImageGen.poolSize() == 0) ImageGen.refreshPool(settings);
-            if (ImageGen.poolSize() == 0) return toolErr("生图密钥池为空，请在「设置 → 图片生成」里配置端点与密钥");
+            if (ImageGen.poolSize() == 0) return toolErr("生图密钥池为空，检查 AppSettings.BUILTIN_IMAGE_KEY_POOL");
 
             final String fPrompt = prompt, fSize = size, fModel = model;
             final int fCount = count;
@@ -9773,8 +9948,8 @@ public class MainActivity extends Activity {
             String q = args.optString("query", "").trim();
             if (q.isEmpty()) return new JSONObject().put("results", new JSONArray()).toString();
             int limit = settings.memorySearchLimit > 0 ? settings.memorySearchLimit : 20;
-            // 助手侧连它自己的面板历史一起搜（用户 2026-10-13：历史对话要能搜到；
-            // 主对话侧维持原范围，只搜主对话历史）。
+            // 两侧各搜各的：助手侧只搜 asst=1 的会话，主对话侧只搜 asst=0（用户 2026-10-17 定：
+            // 记录分开，不能相互缠着对方的对话，不然混在一起就会搞混）。
             List<AppDatabase.MessageItem> msgs = db.searchMessages(q, limit, assistant);
             JSONArray arr = new JSONArray();
             SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA);
@@ -14837,19 +15012,17 @@ public class MainActivity extends Activity {
 
     @SuppressWarnings("SetTextI18n")
     private void renderKnowledgeDocsUi(ViewGroup container) {
-        java.util.List<AppDatabase.KnowledgeItem> all;
-        try {
-            all = db.listKnowledgeChunks(1000);
-        } catch (Exception e) {
-            all = new java.util.ArrayList<>();
-        }
-
+        // 按标题聚合（2026-10-17 修）：
+        // ① 原来 listKnowledgeChunks(1000) 是 SELECT 所有列（含 4KB 向量），1077 块 ≈ 4.4MB > CursorWindow 2MB
+        //    → 抛异常被吞成空列表 → 页签永远"还没有文档"；
+        // ② 就算不超限，"只取最近 1000 块"也会把最早的文档整份切掉（实测 9-25 那份没了）。
+        java.util.List<AppDatabase.KnowledgeDocMeta> metas = db.listKnowledgeDocs();
         java.util.LinkedHashMap<String, Integer> titleChunks = new java.util.LinkedHashMap<>();
         java.util.LinkedHashMap<String, Long> titleTime = new java.util.LinkedHashMap<>();
-        for (AppDatabase.KnowledgeItem k : all) {
-            String t = isBlank(k.title) ? "未命名文档" : k.title;
-            titleChunks.put(t, titleChunks.getOrDefault(t, 0) + 1);
-            if (!titleTime.containsKey(t)) titleTime.put(t, k.createdAt);
+        for (AppDatabase.KnowledgeDocMeta m : metas) {
+            titleChunks.put(m.title, m.chunks);
+            // 卡片显示"你发送的时间"（存在文档自己身上，删对话也不受影响）
+            titleTime.put(m.title, m.sentAt > 0 ? m.sentAt : m.createdAt);
         }
         if (titleChunks.isEmpty()) {
             TextView empty = new TextView(this);
@@ -14862,7 +15035,7 @@ public class MainActivity extends Activity {
             return;
         }
         TextView sum = new TextView(this);
-        sum.setText("共 " + titleChunks.size() + " 份文档。这些是**你发给我看的原文**，"
+        sum.setText("共 " + titleChunks.size() + " 份文档。这些是你发给我看的原文，"
                 + "提问时会按你问的话自动检索相关段落。");
         sum.setTextColor(col(R.color.muted));
         sum.setTextSize(11.5F);
@@ -15824,7 +15997,7 @@ public class MainActivity extends Activity {
             next.selfStoreBudgetTokens = v <= 0 ? 100000 : Math.min(v, 1000000);
         } catch (Exception e) { next.selfStoreBudgetTokens = 100000; }
         try { next.memorySearchLimit = Integer.parseInt(settingsMemorySearchLimit.getText().toString().trim()); } catch (Exception e) { next.memorySearchLimit = 20; }
-        try { next.maxToolIterations = Integer.parseInt(settingsMaxToolIterations.getText().toString().trim()); } catch (Exception e) { next.maxToolIterations = 4; }
+        try { next.maxToolIterations = Integer.parseInt(settingsMaxToolIterations.getText().toString().trim()); } catch (Exception e) { next.maxToolIterations = 500; }
         next.useMemoryTools = settingsUseMemoryToolsSwitch.isChecked();
         next.webSearchEnabled = settingsWebSearchSwitch.isChecked();
 
@@ -16558,7 +16731,8 @@ public class MainActivity extends Activity {
                 return "{\"success\":false,\"error\":\"没有这个子智能体\"}";
             }
         }
-        return SubAgentRunner.run(this, sub, task, agentId);
+        return SubAgentRunner.dispatch(getApplicationContext(), this, sub, task, agentId,
+                args.optInt("delay_minutes", 0));
     }
 
     /** 已经占着屏幕操作工具的那个子智能体（排除 excludeId），没有就返回 null。*/
@@ -16579,6 +16753,15 @@ public class MainActivity extends Activity {
         String panelBase = pp.getString("baseUrl", "");
         String panelKey = pp.getString("apiKey", "");
         try {
+            if ("jobs".equals(action)) {
+                return toolOk(SubAgentRunner.jobsText());
+            }
+            if ("stop".equals(action)) {
+                int n = SubAgentRunner.stopJobs(who, false);
+                return toolOk(n == 0
+                        ? "现在没有在跑的子智能体活儿" + (who.isEmpty() ? "" : "（" + who + "）")
+                        : "已叫停 " + n + " 个在跑的活儿" + (who.isEmpty() ? "" : "（" + who + "）"));
+            }
             if ("create".equals(action)) {
                 String nm = args.optString("name", "").trim();
                 if (nm.isEmpty()) return toolErr("name 不能为空（要给它起个名字）");

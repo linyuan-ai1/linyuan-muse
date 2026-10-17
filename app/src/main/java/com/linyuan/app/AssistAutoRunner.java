@@ -12,9 +12,11 @@ import java.util.List;
 /**
  * 定时激活主助手：不用打开界面，自己跑一轮，把结论写回面板当前对话。
  *
- * <p>为什么单独写一套（不复用 MainActivity.handleAllTool）：那套工具实现挂在 Activity 上
- * （浏览器面板、地图面板、无障碍界面都要有个活的界面），无界面下会崩。
- * 这里只带**不依赖界面**的那部分工具，跟 TaskRunner 给定时任务的做法一样。
+ * <p>为什么单独留一套无界面工具（不能直接用 MainActivity.handleAllTool）：那套工具实现挂在
+ * Activity 上（浏览器面板、地图面板、无障碍界面都要有个活的界面），界面没了会崩。
+ * 所以这里是**两级**：主助手还活着（{@code MainActivity.current()} 非空）就用它的完整工具集
+ * （含派活 call_subagent，跟面板里说话等价）；进程还在但没有界面，才退回这套无界面工具。
+ * 跟 TaskRunner 给定时任务的做法一致。
  *
  * <p>失败重试：模型请求连续失败最多 3 次、每次间隔约 1 分钟；全失败记一条失败日志
  * （面板「定时」按钮上会冒红点，数字就是没看过的失败次数）。
@@ -26,7 +28,19 @@ public final class AssistAutoRunner {
     /** 失败后最多再试 3 次（连同第一次，一轮最多 4 次请求 —— 用户定「最多重试3次」）。 */
     private static final int RETRY = 3;
     private static final long RETRY_GAP_MS = 60_000L;
-    private static final int MAX_ITERS = 6;
+
+    /**
+     * 工具轮数上限：跟主对话/助手面板同一个来源（voice_companion 的 maxToolIterations）。
+     *
+     * <p>2026-10-17 改：原来这里写死 6、子智能体写死 8、面板夹在 20 —— 三个数各管一段，
+     * 用户在设置里填多少都不作数。现在只有一处可配，全读它。
+     */
+    private static int maxIters(Context c) {
+        int v = c.getSharedPreferences("voice_companion", Context.MODE_PRIVATE)
+                .getInt("maxToolIterations", 500);
+        if (v <= 0) v = 500;
+        return v;
+    }
 
     /** 入口。跑完自己排下一次。 */
     public static void run(Context ctx, String src) {
@@ -81,14 +95,6 @@ public final class AssistAutoRunner {
             }
         }
         return hit;
-    }
-
-    private static boolean hadDueSelf(Context c) {
-        long border = System.currentTimeMillis() + 30_000L;
-        for (AssistTimerStore.SelfAt s : AssistTimerStore.selfList(c)) {
-            if (s.at <= border) return true;
-        }
-        return false;
     }
 
     /** 面板对话里也用同一个工具（界面版只是多了别的工具，行为完全一致）。 */
@@ -147,10 +153,23 @@ public final class AssistAutoRunner {
             String sys = headlessPrompt(c, db, rolePrompt);
             List<AppDatabase.MessageItem> hist = tailOf(db.listMessagesInConversation(convId, true), 40);
 
+            MainActivity act = MainActivity.current();
+            if (act == null) {
+                // 用户定案：不要"残缺版助手"兜底。没界面就把主助手拉起来，拉不起来如实失败（重试+记失败）。
+                android.util.Log.i("VC_ASSIST_T", "定时激活：主助手不在，拉起它");
+                act = MainActivity.wake(c);
+            }
+            if (act == null) {
+                throw new Exception("主助手起不来（后台拉 Activity 被拦），这一轮没跑");
+            }
+            JSONArray tools = SubAgentRunner.fullAssistantTools(act, agentId);
+            AiClient.ToolHandler handler = new AssistantToolHandler(act, agentId);
+            s = act.buildAssistantSettings(model, baseUrl, apiKey, thinkLevel);
+            android.util.Log.i("VC_ASSIST_T", "定时激活走主助手完整工具集（" + tools.length() + " 个工具）");
             AiClient.ChatResult r = AiClient.chatDirect(
                     s.baseUrl, s.apiKey, s.model, sys, hist,
                     "【自我激活】现在是你自己定下的时间到了。按上面说的做这一步。",
-                    buildTools(s), MAX_ITERS, buildHandler(c, db, s), thinkLevel);
+                    tools, maxIters(c), handler, thinkLevel);
             String out = r == null || r.content == null ? "" : r.content.trim();
             if (out.isEmpty()) return null;
 
@@ -264,200 +283,6 @@ public final class AssistAutoRunner {
 
     // ---------- 工具（无界面子集） ----------
 
-    private static JSONArray buildTools(AppSettings s) {
-        JSONArray tools = new JSONArray();
-        try {
-            // schedule_self：设置 / 查看 / 移除它自己的触发时间
-            JSONObject st = new JSONObject();
-            st.put("name", "schedule_self");
-            st.put("description", "Set, list or remove your OWN one-shot wake-up times (for continuing a task later). "
-                    + "Each time you set fires ONCE and then disappears - if you need it again after that, set it again at that point. "
-                    + "Limits (enforced by the system): at least 5 minutes ahead, at most 15 days ahead, "
-                    + "one created per 5 minutes at most (you cannot set a dozen in the same minute), "
-                    + "and any two of yours at least 5 minutes apart. A rejected add comes back with the reason and your current list. "
-                    + "To repeat a step, wake yourself, do it, then set the next one from there. "
-                    + "The user's repeating times are not yours to touch - this tool only manages what you set.");
-            JSONObject sp = new JSONObject();
-            sp.put("action", new JSONObject().put("type", "string")
-                    .put("enum", new JSONArray().put("add").put("list").put("remove")));
-            sp.put("delay_minutes", new JSONObject().put("type", "integer")
-                    .put("description", "For add, relative form: wake me in N minutes (at least 5, at most 21600 = 15 days). E.g. 60 = one hour from now."));
-            sp.put("date", new JSONObject().put("type", "string")
-                    .put("description", "For add, absolute form: the date, format YYYY-MM-DD (must be within 15 days). Use with time."));
-            sp.put("times", new JSONObject().put("type", "string")
-                    .put("description", "For add, absolute form: one or more clock times, HH:mm (24-hour), comma-separated, "
-                            + "e.g. \"03:00, 09:30, 21:00\". Use with date - this is how you set several times on one day."));
-            sp.put("note", new JSONObject().put("type", "string")
-                    .put("description", "For add, optional: one line on what this wake-up is for (your own note)."));
-            sp.put("id", new JSONObject().put("type", "integer")
-                    .put("description", "For remove: the id of the entry to drop (see action=list)."));
-            st.put("parameters", new JSONObject().put("type", "object").put("properties", sp)
-                    .put("required", new JSONArray().put("action")));
-            tools.put(new JSONObject().put("type", "function").put("function", st));
-
-            // 记忆工具（写它自己的三本 + 自述）
-            JSONObject mm = new JSONObject();
-            mm.put("name", "manage_memory");
-            mm.put("description", "Add/edit/delete your own long-term memory. Three sections: "
-                    + "target=order for preferences/conventions/rules/skills; target=episode for things you did and their outcomes; "
-                    + "target=judge for key judgments and the history of rule changes. "
-                    + "add inserts; replace rewrites the entry whose text contains old_text; remove deletes by old_text; list shows the section.");
-            JSONObject mp = new JSONObject();
-            mp.put("action", new JSONObject().put("type", "string")
-                    .put("enum", new JSONArray().put("add").put("replace").put("remove").put("list")));
-            mp.put("target", new JSONObject().put("type", "string")
-                    .put("enum", new JSONArray().put("order").put("episode").put("judge")));
-            mp.put("content", new JSONObject().put("type", "string").put("description", "The content to write (for add/replace)"));
-            mp.put("old_text", new JSONObject().put("type", "string")
-                    .put("description", "A unique substring locating the entry (for replace/remove)"));
-            mm.put("parameters", new JSONObject().put("type", "object").put("properties", mp)
-                    .put("required", new JSONArray().put("action").put("target")));
-            tools.put(new JSONObject().put("type", "function").put("function", mm));
-
-            JSONObject sn = new JSONObject();
-            sn.put("name", "self_note");
-            sn.put("description", "Your own private notebook - only you read it. What goes in is your call. "
-                    + "add appends one entry; replace rewrites the entry containing old_text; remove deletes it; list shows everything.");
-            JSONObject snp = new JSONObject();
-            snp.put("action", new JSONObject().put("type", "string")
-                    .put("enum", new JSONArray().put("add").put("replace").put("remove").put("list")));
-            snp.put("content", new JSONObject().put("type", "string").put("description", "The content to write (for add/replace)"));
-            snp.put("old_text", new JSONObject().put("type", "string").put("description", "A unique substring locating the entry"));
-            sn.put("parameters", new JSONObject().put("type", "object").put("properties", snp)
-                    .put("required", new JSONArray().put("action")));
-            tools.put(new JSONObject().put("type", "function").put("function", sn));
-
-            // 翻历史（主对话 + 面板自己的会话都搜，2026-10-13）
-            JSONObject ss = new JSONObject();
-            ss.put("name", "search_sessions");
-            ss.put("description", "Full-text search over past messages - both the main conversations with the user and your own panel history - for recalling what was discussed or decided before.");
-            JSONObject ssp = new JSONObject();
-            ssp.put("query", new JSONObject().put("type", "string").put("description", "Search keywords"));
-            ss.put("parameters", new JSONObject().put("type", "object").put("properties", ssp)
-                    .put("required", new JSONArray().put("query")));
-            tools.put(new JSONObject().put("type", "function").put("function", ss));
-
-            // 查看用户侧记忆库（只读；用户 2026-10-13 定：助手能看不能改）
-            JSONObject rml = new JSONObject();
-            rml.put("name", "read_memory_library");
-            rml.put("description", "Read-only search over the **user-side memory library**: long-term memory about the user"
-                    + " (his facts, preferences, conclusions, saved details) plus the main conversation's own notes."
-                    + " **Read-only** - you cannot add, edit or delete these entries; your own books go through manage_memory and self_note.");
-            JSONObject rmlProps = new JSONObject();
-            rmlProps.put("query", new JSONObject().put("type", "string")
-                    .put("description", "Optional keywords; omit to list what is in the library"));
-            rmlProps.put("limit", new JSONObject().put("type", "integer")
-                    .put("description", "Max entries to return, default 30, max 100"));
-            rml.put("parameters", new JSONObject().put("type", "object").put("properties", rmlProps)
-                    .put("required", new JSONArray()));
-            tools.put(new JSONObject().put("type", "function").put("function", rml));
-
-            // 感知树（用户 2026-10-13）：档案树的增删改查；标题骨架已在上面注入了。
-            tools.put(new JSONObject().put("type", "function").put("function",
-                    PerceptionStore.buildToolSchema()));
-
-            if (s != null && s.webSearchEnabled) {
-                JSONObject ws = new JSONObject();
-                ws.put("name", "web_search");
-                ws.put("description", "Search the web for current facts (news / live data / policy / prices).");
-                JSONObject wsp = new JSONObject();
-                wsp.put("query", new JSONObject().put("type", "string").put("description", "Search keywords"));
-                wsp.put("freshness", new JSONObject().put("type", "string")
-                        .put("description", "Optional time range: dN = last N days, mN = months, yN = years; omit = no limit"));
-                ws.put("parameters", new JSONObject().put("type", "object").put("properties", wsp)
-                        .put("required", new JSONArray().put("query")));
-                tools.put(new JSONObject().put("type", "function").put("function", ws));
-
-                JSONObject fu = new JSONObject();
-                fu.put("name", "fetch_url");
-                fu.put("description", "Fetch and read the body text of a web page.");
-                JSONObject fup = new JSONObject();
-                fup.put("url", new JSONObject().put("type", "string").put("description", "Full URL (http/https)"));
-                fu.put("parameters", new JSONObject().put("type", "object").put("properties", fup)
-                        .put("required", new JSONArray().put("url")));
-                tools.put(new JSONObject().put("type", "function").put("function", fu));
-            }
-        } catch (Exception ignored) { }
-        return tools;
-    }
-
-    private static AiClient.ToolHandler buildHandler(final Context c, final AppDatabase db, final AppSettings s) {
-        return (name, args) -> {
-            if ("schedule_self".equals(name)) return handleScheduleSelf(c, args);
-            if ("manage_memory".equals(name)) return handleManageMemory(db, args);
-            if ("self_note".equals(name)) return handleSelfNote(db, args);
-            if ("search_sessions".equals(name)) {
-                String q = args == null ? "" : args.optString("query", "").trim();
-                if (q.isEmpty()) return err("query must not be empty");
-                java.text.SimpleDateFormat f =
-                        new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.CHINA);
-                JSONArray arr = new JSONArray();
-                for (AppDatabase.MessageItem m : db.searchMessages(q, 20, true)) {
-                    String cc = m.content == null ? "" : m.content;
-                    int t = cc.indexOf("@@THINKING:");
-                    if (t >= 0) cc = cc.substring(0, t).trim();
-                    arr.put(new JSONObject().put("time", f.format(new java.util.Date(m.createdAt)))
-                            .put("role", "user".equals(m.role) ? "user" : "you").put("text", cc));
-                }
-                return new JSONObject().put("results", arr).put("now", AiClient.nowText()).toString();
-            }
-            if ("web_search".equals(name)) {
-                String q = args == null ? "" : args.optString("query", "").trim();
-                if (q.isEmpty()) return err("query must not be empty");
-                try {
-                    JSONArray rs = AiClient.searchWebPublic(s, q, args.optString("freshness", "").trim());
-                    JSONArray out = new JSONArray();
-                    for (int i = 0; i < rs.length(); i++) {
-                        JSONObject r = rs.optJSONObject(i);
-                        if (r == null) continue;
-                        out.put(new JSONObject().put("title", r.optString("title", ""))
-                                .put("url", r.optString("url", ""))
-                                .put("snippet", r.optString("snippet", ""))
-                                .put("date", r.optString("date", "unknown")));
-                    }
-                    return new JSONObject().put("results", out).put("now", AiClient.nowText()).toString();
-                } catch (Exception e) {
-                    return err("Search failed: " + e.getMessage());
-                }
-            }
-            if ("fetch_url".equals(name)) {
-                String u = args == null ? "" : args.optString("url", "").trim();
-                if (u.isEmpty()) return err("url must not be empty");
-                try {
-                    return new JSONObject().put("url", u).put("text", AiClient.fetchUrlText(s, u))
-                            .put("now", AiClient.nowText()).toString();
-                } catch (Exception e) {
-                    return err("Failed to fetch the page: " + e.getMessage());
-                }
-            }
-            if ("read_memory_library".equals(name)) {
-                String q = args == null ? "" : args.optString("query", "").trim();
-                int limit = args == null ? 30 : args.optInt("limit", 30);
-                limit = Math.max(1, Math.min(100, limit));
-                JSONArray arr = new JSONArray();
-                try {
-                    for (AppDatabase.MemoryItem it : db.searchUserSideMemories(q, limit)) {
-                        arr.put(new JSONObject()
-                                .put("content", it.content == null ? "" : it.content)
-                                .put("category", it.category == null ? "" : it.category)
-                                .put("who", "self".equals(it.store) ? "主对话自己的笔记" : "用户")
-                                .put("pinned", it.pinned));
-                    }
-                } catch (Exception e) {
-                    return err("Read failed: " + e.getMessage());
-                }
-                return new JSONObject().put("success", true).put("entries", arr)
-                        .put("note", "Read-only view of the user-side memory library.")
-                        .toString();
-            }
-            // 感知树（用户 2026-10-13）
-            if ("perception".equals(name)) {
-                return PerceptionStore.handleTool(db, args);
-            }
-            return err("Tool not available in a self-activated run: " + name);
-        };
-    }
-
     private static String handleScheduleSelf(Context c, JSONObject args) throws Exception {
         String action = args == null ? "" : args.optString("action", "").trim();
         if ("list".equals(action)) {
@@ -478,6 +303,12 @@ public final class AssistAutoRunner {
             AssistTimer.reschedule(c);
             return hit ? new JSONObject().put("success", true).put("message", "removed").toString()
                     : err("no entry with that id");
+        }
+        // 总开关关着的时候排了也不会触发（AssistFireTimes.next 直接返回 0），
+        // 所以这里必须挡住，不能让助手回一句"定了"然后就没了（2026-10-16 用户就是被这么坑的）。
+        if (!AssistTimerStore.enabled(c)) {
+            return err("定时激活总开关关着（用户还没在助手面板的「定时」里打开并保存），"
+                    + "现在排了也不会触发。先跟用户说清楚，让他去打开那个开关。");
         }
         // add：支持一次给多个时间点（"某一天的某几个时间段"）
         List<Long> ats = new ArrayList<>();
@@ -537,88 +368,6 @@ public final class AssistAutoRunner {
                 .put("ids", new JSONArray(ar.ids == null ? new ArrayList<>() : ar.ids))
                 .put("at", setAt)
                 .put("message", "Set. Each fires once and then disappears.").toString();
-    }
-
-    private static String handleManageMemory(AppDatabase db, JSONObject args) throws Exception {
-        String action = args == null ? "" : args.optString("action", "").trim();
-        String target = args == null ? "episode" : args.optString("target", "episode").trim();
-        if (!"order".equals(target) && !"judge".equals(target) && !"episode".equals(target)) target = "episode";
-        String store = "order".equals(target) ? AssistantMemory.STORE_ORDER
-                : ("judge".equals(target) ? AssistantMemory.STORE_JUDGE : AssistantMemory.STORE_EPISODE);
-        String cat = "order".equals(target) ? "序" : ("judge".equals(target) ? "判" : "事");
-        String content = args == null ? "" : args.optString("content", "").trim();
-        String oldText = args == null ? "" : args.optString("old_text", "").trim();
-
-        if ("list".equals(action)) {
-            JSONArray entries = new JSONArray();
-            for (AppDatabase.MemoryItem it : db.listMemoriesByStore(store)) entries.put(it.content);
-            return new JSONObject().put("success", true).put("entries", entries).toString();
-        }
-        if ("add".equals(action)) {
-            if (content.isEmpty()) return err("content must not be empty");
-            for (AppDatabase.MemoryItem it : db.listMemoriesByStore(store)) {
-                if (it.content.trim().equals(content)) {
-                    return new JSONObject().put("success", true).put("message", "already there; not added again").toString();
-                }
-            }
-            db.insertMemoryStore(content, cat, store);
-            return new JSONObject().put("success", true).put("message", "saved to " + target).toString();
-        }
-        if ("replace".equals(action)) {
-            if (oldText.isEmpty() || content.isEmpty()) return err("replace needs old_text and content");
-            List<Long> ids = db.findMemoryIdsBySubstring(store, oldText);
-            if (ids.isEmpty()) return err("no entry matches old_text");
-            if (ids.size() > 1) return err("old_text matches more than one entry - be more specific");
-            db.updateMemoryContent(ids.get(0), content);
-            return new JSONObject().put("success", true).put("message", "updated").toString();
-        }
-        if ("remove".equals(action)) {
-            if (oldText.isEmpty()) return err("remove needs old_text");
-            List<Long> ids = db.findMemoryIdsBySubstring(store, oldText);
-            if (ids.isEmpty()) return err("no entry matches old_text");
-            for (Long id : ids) db.deleteMemory(id);
-            return new JSONObject().put("success", true).put("message", "removed " + ids.size()).toString();
-        }
-        return err("unknown action");
-    }
-
-    private static String handleSelfNote(AppDatabase db, JSONObject args) throws Exception {
-        String action = args == null ? "" : args.optString("action", "").trim();
-        String content = args == null ? "" : args.optString("content", "").trim();
-        String oldText = args == null ? "" : args.optString("old_text", "").trim();
-        String store = AssistantMemory.STORE_SELF;
-        if ("list".equals(action)) {
-            JSONArray entries = new JSONArray();
-            for (AppDatabase.MemoryItem it : db.listMemoriesByStore(store)) entries.put(it.content);
-            return new JSONObject().put("success", true).put("entries", entries).toString();
-        }
-        if ("add".equals(action)) {
-            if (content.isEmpty()) return err("content must not be empty");
-            for (AppDatabase.MemoryItem it : db.listMemoriesByStore(store)) {
-                if (it.content.trim().equals(content)) {
-                    return new JSONObject().put("success", true).put("message", "already there; not added again").toString();
-                }
-            }
-            String cat = args.optString("category", "").trim();
-            db.insertMemoryStore(content, cat.isEmpty() ? "身份" : MemoryDim.normalizeSelf(cat), store);
-            return new JSONObject().put("success", true).put("message", "noted").toString();
-        }
-        if ("replace".equals(action)) {
-            if (oldText.isEmpty() || content.isEmpty()) return err("replace needs old_text and content");
-            List<Long> ids = db.findMemoryIdsBySubstring(store, oldText);
-            if (ids.isEmpty()) return err("no entry matches old_text");
-            if (ids.size() > 1) return err("old_text matches more than one entry - be more specific");
-            db.updateMemoryContent(ids.get(0), content);
-            return new JSONObject().put("success", true).put("message", "updated").toString();
-        }
-        if ("remove".equals(action)) {
-            if (oldText.isEmpty()) return err("remove needs old_text");
-            List<Long> ids = db.findMemoryIdsBySubstring(store, oldText);
-            if (ids.isEmpty()) return err("no entry matches old_text");
-            for (Long id : ids) db.deleteMemory(id);
-            return new JSONObject().put("success", true).put("message", "removed " + ids.size()).toString();
-        }
-        return err("unknown action");
     }
 
     private static String err(String msg) {

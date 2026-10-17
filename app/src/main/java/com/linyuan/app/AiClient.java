@@ -1960,7 +1960,6 @@ public class AiClient {
             return searchViaApi(settings, query);
         }
 
-        // 只有配了用户 key 或密钥池非空才走搜索 API，否则直接降级 Bing RSS。
         if (!isBlank(settings.searchApiKey) || searchPoolSize() > 0) {
             try {
                 JSONArray r = searchViaTokentiq(settings, query, freshness);
@@ -3305,7 +3304,14 @@ public class AiClient {
 
             if (stopFlag != null && stopFlag.get()) break;
 
-            boolean sendTools = tools != null && tools.length() > 0;
+            // 最后一轮不发工具（2026-10-17 修）：原来只要模型调了工具就 continue 再发工具，
+            // 最后一轮也一样 —— 于是一路调工具、把预算烧光、一个字都没写（用户实测
+            // "回报后主助手又跑了一轮：0 字"，240 字那次是恰好收尾写了）。
+            // 撤掉最后一轮的工具，它就只剩"写正文"这一条路。
+            // 轮数 <= 2 时不启用：那种调用本来就是"要么一次工具、要么直接写"，
+            // 再收一轮就没工具可用了（下限 2 是函数开头 Math.max(2, ...) 定的）。
+            boolean lastRound = iterations > 2 && iter == iterations - 1;
+            boolean sendTools = tools != null && tools.length() > 0 && !lastRound;
             JSONObject body = new JSONObject();
             body.put("model", isBlank(chatModel(settings)) ? "qwen-plus" : chatModel(settings).trim());
             body.put("messages", messages);
@@ -3770,6 +3776,28 @@ public class AiClient {
             messages.put(new JSONObject().put("role", "user").put("content", "Give your final answer in Chinese."));
         }
 
+        // 最后一道保险（2026-10-17 加）：整轮跑完还是没写正文，就撤掉工具、
+        // 把已经查到的结果带上，再要一次结论。子智能体那条路早有同样的兜底
+        //（"去掉工具，带着资料要一次结论"），主助手/唤醒轮一直缺这一个。
+        if (contentAll.toString().trim().isEmpty()
+                && tools != null && tools.length() > 0 && handler != null
+                && (stopFlag == null || !stopFlag.get())) {
+            try {
+                String digest = toolLog == null ? "" : toolLog.trim();
+                android.util.Log.w("VC_AGENT", "轮数用光仍无正文 → 撤掉工具带资料再要一次结论");
+                String ask = "[Tool rounds are used up - write the conclusion now, call no tool]\n\n"
+                        + "[Data already gathered]\n" + (digest.isEmpty() ? "(nothing)" : digest)
+                        + "\n\n[Original request]\n" + (userText == null ? "" : userText);
+                ChatResult forced = chatDirect(chatBase(settings), chatKey(settings), chatModel(settings),
+                        systemPrompt, null, ask, null, 2, null, thinkingLevelOf(settings));
+                if (forced != null && forced.content != null && !forced.content.trim().isEmpty()) {
+                    contentAll.append(forced.content.trim());
+                }
+            } catch (Throwable t) {
+                android.util.Log.w("VC_AGENT", "撤工具重问失败: " + t.getMessage());
+            }
+        }
+
         ChatResult fallback = new ChatResult(contentAll.toString().trim(),
                 reasoningAll.length() > 0 ? reasoningAll.toString() : lastReasoning);
         fallback.toolLog = toolLog;
@@ -4029,7 +4057,10 @@ public class AiClient {
         int nudgedThisTurn = 0;
         for (int iter = 0; iter < iterations; iter++) {
 
-            boolean sendTools = tools != null && tools.length() > 0;
+            // 同流式版：最后一轮不发工具，强制它必须写正文（2026-10-17 修）。
+            // 轮数 <= 2 时不启用（那种调用本来就只够一次工具）。
+            boolean lastRound = iterations > 2 && iter == iterations - 1;
+            boolean sendTools = tools != null && tools.length() > 0 && !lastRound;
             JSONObject body = new JSONObject();
             body.put("model", isBlank(chatModel(settings)) ? "qwen-plus" : chatModel(settings).trim());
             body.put("messages", messages);

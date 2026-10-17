@@ -461,17 +461,45 @@ public class BrowserIslandView extends LinearLayout {
     public void setDoubleTapAction(Runnable r) {
         ui.post(() -> {
             doubleTapAction = r;
-            tappable = (r != null);
-            setClickable(tappable);
-            setFocusable(tappable);
+            refreshTappable();
         });
     }
 
+    /** 连点三下（灵动岛常驻时的手势）：给"暂停屏幕操作员"用。 */
+    public void setTripleTapAction(Runnable r) {
+        ui.post(() -> {
+            tripleTapAction = r;
+            refreshTappable();
+        });
+    }
+
+    private void refreshTappable() {
+        tappable = (doubleTapAction != null) || (tripleTapAction != null);
+        setClickable(tappable);
+        setFocusable(tappable);
+    }
+
     private volatile Runnable doubleTapAction = null;
+    private volatile Runnable tripleTapAction = null;
     private volatile boolean tappable = false;
-    private long lastTapDownAt = 0L;
+
+    /** 最近三下的按下时刻，用来分辨双击还是三连点。 */
+    private final long[] tapTimes = new long[3];
+    private int tapCount = 0;
 
     private static final long DOUBLE_TAP_MS = 400L;
+
+    /** 第二下之后的双击：先等一个间隔，看第三下会不会来（三连点要吃掉这次双击）。 */
+    private final Runnable fireDouble = () -> {
+        if (tapCount >= 3) return;
+        tapCount = 0;
+        Runnable r = doubleTapAction;
+        if (r != null) {
+            try { r.run(); } catch (Throwable t) {
+                android.util.Log.w("VC_ISLAND", "双击动作失败: " + t);
+            }
+        }
+    };
 
     @Deprecated
     public void setTapAction(Runnable r) {
@@ -485,16 +513,22 @@ public class BrowserIslandView extends LinearLayout {
         int action = ev.getActionMasked();
         if (action == android.view.MotionEvent.ACTION_DOWN) {
             long now = System.currentTimeMillis();
-            if (now - lastTapDownAt <= DOUBLE_TAP_MS) {
-                lastTapDownAt = 0L;
-                Runnable r = doubleTapAction;
+            if (tapCount > 0 && now - tapTimes[tapCount - 1] > DOUBLE_TAP_MS) tapCount = 0;
+            if (tapCount < 3) tapTimes[tapCount] = now;
+            tapCount++;
+            if (tapCount == 2) {
+                // 不当场判双击：可能是三连点的第二下，等一个间隔再说
+                ui.removeCallbacks(fireDouble);
+                ui.postDelayed(fireDouble, DOUBLE_TAP_MS);
+            } else if (tapCount >= 3) {
+                ui.removeCallbacks(fireDouble);
+                tapCount = 0;
+                Runnable r = tripleTapAction;
                 if (r != null) {
                     try { r.run(); } catch (Throwable t) {
-                        android.util.Log.w("VC_ISLAND", "双击动作失败: " + t);
+                        android.util.Log.w("VC_ISLAND", "三连点动作失败: " + t);
                     }
                 }
-            } else {
-                lastTapDownAt = now;
             }
             return true;
         }
